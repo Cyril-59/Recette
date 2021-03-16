@@ -1,8 +1,62 @@
 /* You can add global styles to this file, and also import other style files */
 
+/* MEDIA */
+@media (max-width: 1000px) {
+    h1 {
+        font-size: 1.5em;
+    }
+    label {
+        font-size: 11px;
+    }
+}
+
 /* FLEX */
 .flex {
     display: flex;
+}
+
+.flex1 {
+    flex: 1;
+}
+
+.flex2 {
+    flex: 2;
+}
+
+.flex3 {
+    flex: 3;
+}
+
+.flex4 {
+    flex: 4;
+}
+
+.flex-wrap {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.flex-column
+{
+    display: flex;
+    flex-direction: column;
+}
+
+.flex-around
+{
+    display: flex;
+    justify-content: space-around;
+}
+
+.flex-between
+{
+    display: flex;
+    justify-content: space-between;
+}
+
+.flex-end
+{
+    align-self: flex-end;
 }
 
 /* PRIMENG */ 

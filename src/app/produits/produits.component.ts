@@ -1,4 +1,4 @@
-import { Component, OnInit, EventEmitter, Output } from '@angular/core';
+import { Component, OnInit, EventEmitter, Output, HostListener } from '@angular/core';
 import { ProduitService } from '../services/produit.service';
 import { Produit } from '../model/produit';
 import { SelectItem } from 'primeng/api/selectitem';
@@ -24,6 +24,7 @@ export class ProduitsComponent implements OnInit {
   options: SelectItem[];
   types: SelectItem[];
   unites: SelectItem[];
+  innerWidth: number;
 
   edit = false;
   editTitle = 'Création';
@@ -34,6 +35,15 @@ export class ProduitsComponent implements OnInit {
 
   ngOnInit(): void {
     this.getProduits();
+  }
+
+  ngAfterViewInit(): void {
+    this.innerWidth = window.innerWidth;
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event) {
+    this.innerWidth = window.innerWidth;
   }
 
   produitSelected(id) {
