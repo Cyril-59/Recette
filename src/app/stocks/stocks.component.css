@@ -1,0 +1,41 @@
+.right {
+    margin-right: 1em;
+}
+
+.left {
+    margin-left: 1em;
+}
+
+.size {
+    width: 14em;
+}
+
+.bottom {
+    margin-bottom: 1em;
+}
+
+.top {
+    margin-top: 1em;
+}
+
+.bordure {
+    border-right: 2px solid #c8c8c8;
+    margin-right: 1em;
+    padding-right: 1em;
+    min-height: 85em;
+}
+
+.floatleft {
+    float: left;
+}
+
+.margin {
+    margin: 1em;
+}
+
+textarea {
+    font-family: "Open Sans", "Helvetica Neue", sans-serif;
+    font-size: 14px;
+    min-width: 88em;
+    min-height: 77em;
+}

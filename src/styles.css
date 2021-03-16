@@ -1,0 +1,40 @@
+/* You can add global styles to this file, and also import other style files */
+
+/* FLEX */
+.flex {
+    display: flex;
+}
+
+/* PRIMENG */ 
+
+body .ui-table .ui-table-tbody > tr {
+    background-color: #e7f9e7 !important;
+}
+body .ui-table .ui-table-tbody > tr:nth-child(even) {
+    background-color: #bbeebb !important;
+}
+
+body .ui-button.ui-state-default.ui-button-secondary, body .ui-buttonset.ui-button-secondary > .ui-button.ui-state-default {
+    color: #ffffff !important;
+    background-color: #48b3e0 !important;
+    border: 1px solid #48b3e0 !important;
+}
+
+body .ui-button {
+    background-color: #48b3e0 !important;
+    border: 1px solid #48b3e0 !important;
+}
+
+body .ui-tabview.ui-tabview-top .ui-tabview-nav li.ui-state-active, body .ui-tabview.ui-tabview-bottom .ui-tabview-nav li.ui-state-active, body .ui-tabview.ui-tabview-left .ui-tabview-nav li.ui-state-active, body .ui-tabview.ui-tabview-right .ui-tabview-nav li.ui-state-active {
+    background-color: #48b3e0 !important;
+    border: 1px solid #48b3e0 !important;
+}
+
+body .ui-paginator .ui-paginator-pages .ui-paginator-page.ui-state-active {
+    background-color: #48b3e0 !important;
+    color: #ffffff;
+}
+
+.ui-dropdown-panel .ui-dropdown-items-wrapper {
+    max-height: 400px !important;
+}

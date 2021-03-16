@@ -1,0 +1,25 @@
+<p-toast></p-toast>
+<div id="spinner" *ngIf="!(produitReady && recetteReady)">
+    <div id="inner">
+        <p-progressSpinner></p-progressSpinner>
+    </div>
+</div>
+<!--<app-produits (onProduits)="setProduits($event)"></app-produits>
+<app-recettes [produits]="produits" (onRecettes)="setRecettes($event)"></app-recettes>
+<app-stocks [produits]="produits" [recettes]="recettes"></app-stocks>-->
+<div>
+    <h1 style="display: inline-block; margin-left: 34em; font-family: 'Open Sans'">Qu'est-ce qu'on mange ?</h1>
+    <img style="height: 100px; float: right;" src="/assets/logo.png"></div>
+<div>
+<p-tabView>
+    <p-tabPanel header="Produits" leftIcon="pi pi-list">
+        <app-produits (onProduits)="setProduits($event)"></app-produits>
+    </p-tabPanel>
+    <p-tabPanel header="Recettes" leftIcon="pi pi-home">
+        <app-recettes [produits]="produits" (onRecettes)="setRecettes($event)"></app-recettes>
+    </p-tabPanel>
+    <p-tabPanel header="Stocks & Courses" leftIcon="pi pi-shopping-cart">
+        <app-stocks [produits]="produits" [recettes]="recettes"></app-stocks>
+    </p-tabPanel>
+</p-tabView>
+</div>
