@@ -1,0 +1,12 @@
+<div class="flex-column">
+    <div class="flex-between">
+        <h1>Liste de courses</h1>
+        <img style="width: 125px;" src="/assets/basket.png">
+    </div>
+    <div>
+        <p-editor #editor [(ngModel)]="text"></p-editor>
+    </div>
+    <div class="flex-end">
+        <p-button class="right top" icon="pi pi-copy" [clipboard]="editor" (copied)="notify($event)"></p-button>
+    </div>
+</div>

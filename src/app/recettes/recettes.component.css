@@ -2,6 +2,10 @@
     margin-right: 1em;
 }
 
+.left {
+    margin-left: 1em;
+}
+
 .size {
     width: 14em;
 }
@@ -16,7 +20,7 @@
 }
 
 #recipes {
-    height: 130px;
+    height: 110px;
     background-repeat: no-repeat;
     background-position-x: right;
 }
@@ -24,7 +28,7 @@
 @media (min-width: 1400px) {
     #recipes {
         width: 1100px;
-        background-size: 1100px;
+        background-size: 950px;
         background-image: url('/assets/recipes_big.png');
     }
 }
@@ -32,7 +36,7 @@
 @media (min-width: 800px) and (max-width: 1400px) {
     #recipes {
         width: 500px;
-        background-size: 500px;
+        background-size: 450px;
         background-image: url('/assets/recipes_medium.png');
     }
 }

@@ -24,6 +24,7 @@ import { RecettesComponent } from './recettes/recettes.component';
 import { MessageService } from 'primeng/api';
 import { StocksComponent } from './stocks/stocks.component';
 import { ClipboardDirective } from './services/clipboard.directive';
+import { CoursesComponent } from './courses/courses.component';
 
 @NgModule({
   declarations: [
@@ -32,6 +33,7 @@ import { ClipboardDirective } from './services/clipboard.directive';
     ProduitsComponent,
     RecettesComponent,
     StocksComponent,
+    CoursesComponent,
     ClipboardDirective
   ],
   imports: [

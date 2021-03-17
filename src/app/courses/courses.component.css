@@ -39,11 +39,3 @@ textarea {
     min-width: 88em;
     min-height: 77em;
 }
-
-.bord-top {
-    border-top: #c8c8c8 2px solid;
-}
-
-.no-border {
-    border: none;
-}

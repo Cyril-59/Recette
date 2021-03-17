@@ -14,6 +14,8 @@ export class AccueilComponent implements OnInit {
   recetteReady = false;
   recettes: Recette[];
   produits: SelectItem[];
+  text: string;
+  index: number = 0;
 
   constructor() { }
 
@@ -30,5 +32,10 @@ export class AccueilComponent implements OnInit {
   setRecettes(recettes) {
     this.recetteReady = true;
     this.recettes = recettes;
+  }
+
+  setText(text) {
+    this.text = text;
+    this.index = 3;
   }
 }

@@ -1,10 +1,10 @@
 <div>
     <div class="flex-between">
-        <h1>Nos Recettes</h1>
+        <h1>Liste des recettes</h1>
         <div id="recipes"></div>
     </div>
     <div class="flex-wrap">
-        <p-table class="flex3" style="min-width: 700px;" #dt [value]="recettes" dataKey="id" styleClass="ui-table-customers" [rowHover]="true"
+        <p-table class="flex3" style="min-width: 500px;" #dt [value]="recettes" dataKey="id" styleClass="ui-table-customers" [rowHover]="true"
         [rows]="10" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]"
         [paginator]="true" currentPageReportTemplate="Eléments {first} à {last} sur un total de {totalRecords}"
         [filterDelay]="0" [globalFilterFields]="['titre', 'stringIngredients']">
@@ -12,7 +12,7 @@
                 <tr>
                     <th pSortableColumn="titre">Titre <p-sortIcon field="label"></p-sortIcon></th>
                     <th>Ingrédients</th>
-                    <th>Actions</th>
+                    <th style="width: 8em;">Actions</th>
                 </tr>
                 <tr>
                     <th>
@@ -55,9 +55,9 @@
             <ng-container *ngFor="let ingredient of recette.ingredients; index as idx">
                 <div class="ui-g bottom">
                     <p-dropdown class="right" [filter]="true" [options]="produits" [(ngModel)]="ingredient.produit" placeholder="Produit"></p-dropdown>
-                    <input id="input" type="text" size="30" pInputText [(ngModel)]="ingredient.quantite" placeholder="Quantité">
-                    <input *ngIf="!!ingredient.produit" id="input" type="text" size="30" pInputText [(ngModel)]="ingredient.produit.unite" [disabled]="true">
-                    <p-button icon="pi pi-trash" (click)="enleverIngredient(idx)"></p-button>
+                    <input id="input" type="text" size="8" pInputText [(ngModel)]="ingredient.quantite" placeholder="Quantité">
+                    <input *ngIf="!!ingredient.produit" id="input" type="text" size="8" pInputText [(ngModel)]="ingredient.produit.unite" [disabled]="true">
+                    <p-button class="left" icon="pi pi-trash" (click)="enleverIngredient(idx)"></p-button>
                 </div>
             </ng-container>
             <p-button class="ui-g size" icon="pi pi-check" label="Ajouter un ingredient" (click)="ajouterIngredient()"></p-button>

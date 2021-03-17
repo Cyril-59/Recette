@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, OnInit, Input, OnChanges, SimpleChanges, EventEmitter, Output } from '@angular/core';
 import { Recette } from '../model/recette';
 import { Ingredient } from '../model/ingredient';
 import { SelectItem } from 'primeng/api/selectitem';
@@ -21,12 +21,12 @@ export class StocksComponent implements OnInit, OnChanges {
   optionsSaisons: SelectItem[];
   courses: Map<string, Ingredient[]>;
   coursesText: string;
-  modeEdition = true;
   mois: string[] = []
   hiver = [1, 2, 3, 12]
   printemps = [3, 4, 5, 6]
   ete = [6, 7, 8 , 9]
   automne = [9, 10, 11, 12]
+  @Output() onCourses = new EventEmitter<string>();
 
   constructor(public messageService: MessageService) { }
 
@@ -53,8 +53,16 @@ export class StocksComponent implements OnInit, OnChanges {
   }
 
   initRecette() {
-    this.autresRecettes = [new Recette()];
+    this.initRecetteSaison();
+    this.initAutreRecette();
+  }
+
+  initRecetteSaison() {
     this.recettesSaison = [new Recette()];
+  }
+
+  initAutreRecette() {
+    this.autresRecettes = [new Recette()];
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -217,7 +225,7 @@ export class StocksComponent implements OnInit, OnChanges {
       }
     });
 
-    this.coursesText = copy + '</p>';
+    this.onCourses.emit(copy + '</p>');
   }
 
   goToUrl(url) {

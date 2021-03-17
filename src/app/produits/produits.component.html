@@ -1,10 +1,10 @@
 <div>
     <div class="flex-between">
-        <h1>Nos Produits</h1>
+        <h1>Liste des produits</h1>
         <div id="vegetables"></div>
     </div>
     <div class="flex-wrap">
-        <p-table class="flex3" style="min-width: 700px;" #dt [value]="produits" dataKey="id" styleClass="ui-table-customers" [rowHover]="true"
+        <p-table class="flex3" style="min-width: 500px;" #dt [value]="produits" dataKey="id" styleClass="ui-table-customers" [rowHover]="true"
             [rows]="10" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]"
             [paginator]="true" currentPageReportTemplate="Eléments {first} à {last} sur un total de {totalRecords}"
             [filterDelay]="0" [globalFilterFields]="['label', 'unite']">

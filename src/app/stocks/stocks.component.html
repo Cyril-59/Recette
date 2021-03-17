@@ -1,27 +1,30 @@
-<div style="height: 85em;">
-    <div class="ui-g-6 bordure">
-        <div>
-            <div style="width: 85em">
-                <h1 style="display: inline-block;">Notre Stock</h1>
-                <img style="width: 125px; float: right" src="/assets/fridge.png">
+<div>
+    <div>
+        <div class="flex-column">
+            <div class="flex-between">
+                <h1>Menu de la semaine</h1>
+                <img style="width: 125px;" src="/assets/fridge.png">
             </div>
 
+            <h2>Ce que j'ai en stock</h2>
             <ng-container *ngFor="let ingredient of ingredients; index as idx">
-                <div class="ui-g bottom">
+                <div class="bottom">
                     <p-dropdown class="right" [filter]="true" [options]="produits" [(ngModel)]="ingredient.produit" placeholder="Produit"></p-dropdown>
-                    <input id="input" type="text" size="30" pInputText [(ngModel)]="ingredient.quantite" placeholder="Quantité">
-                    <input *ngIf="!!ingredient.produit" id="input" type="text" size="30" pInputText [(ngModel)]="ingredient.produit.unite" [disabled]="true">
+                    <input id="input" type="text" size="6" pInputText [(ngModel)]="ingredient.quantite" placeholder="Quantité">
+                    <input *ngIf="!!ingredient.produit" class="no-border" id="input" type="text" size="8" pInputText [(ngModel)]="ingredient.produit.unite" [disabled]="true">
                     <p-button class="left" icon="pi pi-trash" (click)="enleverIngredient(idx)"></p-button>
                 </div>
             </ng-container>
-            <p-button class="ui-g size" icon="pi pi-check" label="Ajouter un ingredient" (click)="ajouterIngredient()"></p-button>
-            <div class="ui-g bottom" style="flex-direction: row-reverse; margin-top: 1em;">
-                <p-button icon="pi pi-check" label="Proposer des recettes" (click)="proposerRecettes()"></p-button>
-                <p-button class="right" icon="pi pi-undo" (click)="initStock()"></p-button>
+            <div>
+                <p-button class="right" icon="pi pi-plus" (click)="ajouterIngredient()"></p-button>
+                <p-button icon="pi pi-undo" (click)="initStock()"></p-button>
+            </div>
+            <div class="bottom" style="margin-top: 1em;">
+                <p-button label="Quelles recettes avec ce stock ?" (click)="proposerRecettes()"></p-button>
             </div>
         </div>
         <div *ngIf="recettesMatch">
-            <h2 class="floatleft">Recettes proposées</h2>
+            <h2>Recettes proposées</h2>
             <p-button class="margin" icon="pi pi-trash" (click)="recettesMatch = null;selectedRecipes = []"></p-button>
             <p-table #dt [value]="recettesMatch" [(selection)]="selectedRecipes" dataKey="id" styleClass="ui-table-customers" [rowHover]="true"
         [rows]="10" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]"
@@ -65,6 +68,11 @@
             </ng-template>
         </p-table>
         </div>
+        <div class="flex">
+            <div class="flex1"></div>
+            <div class="flex6 bord-top"></div>
+            <div class="flex1"></div>
+        </div>
         <div>
             <h2>Recettes de saison</h2>
             <ng-container *ngFor="let recetteSaison of recettesSaison; index as idx">
@@ -73,7 +81,15 @@
                     <p-button icon="pi pi-trash" (click)="enleverRecette(idx, 1)"></p-button>
                 </div>
             </ng-container>
-            <p-button class="ui-g size" icon="pi pi-check" label="Ajouter une recette" (click)="ajouterRecette(1)"></p-button>
+            <div>
+                <p-button class="bottom right" icon="pi pi-plus" (click)="ajouterRecette(1)"></p-button>
+                <p-button icon="pi pi-undo" (click)="initRecetteSaison()"></p-button>
+            </div>
+        </div>
+        <div class="flex">
+            <div class="flex1"></div>
+            <div class="flex6 bord-top"></div>
+            <div class="flex1"></div>
         </div>
         <div>
             <h2>Autres recettes</h2>
@@ -83,33 +99,14 @@
                     <p-button icon="pi pi-trash" (click)="enleverRecette(idx, 2)"></p-button>
                 </div>
             </ng-container>
-            <p-button class="ui-g size" icon="pi pi-check" label="Ajouter une recette" (click)="ajouterRecette(2)"></p-button>
+            <div>
+                <p-button class="bottom right" icon="pi pi-plus" (click)="ajouterRecette(2)"></p-button>
+                <p-button icon="pi pi-undo" (click)="initAutreRecette()"></p-button>
+            </div>
             <p class="ui-g" style="flex-direction: row-reverse;">Recette(s) : {{ getNbRecettes() }}</p>
             <div class="ui-g bottom" style="flex-direction: row-reverse; margin-top: 1em;">
-                <p-button icon="pi pi-check" label="Calculer les courses" (click)="calculerCourses()"></p-button>
-                <p-button class="right" icon="pi pi-undo" (click)="initRecette()"></p-button>
+                <p-button icon="pi pi-shopping-cart" label="Calculer les courses" (click)="calculerCourses()"></p-button>
             </div>
-        </div>
-    </div>
-    <div class="floatleft">
-        <div style="width: 85em">
-            <h1 style="display: inline-block;">Liste de Courses</h1>
-            <img style="width: 125px; float: right" src="/assets/basket.png">
-        </div>
-        <!--<div [hidden]="modeEdition" *ngFor="let type of courses.keys()">
-            <h2>{{ type }} </h2>
-            <ul>
-                <li *ngFor="let course of courses.get(type)">
-                    {{ course.produit.label }} - {{ course.quantite }} {{ course.produit.unite }}
-                </li>
-            </ul>
-        </div>-->
-        <div [hidden]="!modeEdition" style="margin-top: 4em;">
-            <p-editor #editor [(ngModel)]="coursesText"></p-editor>
-        </div>
-        <div class="ui-g top">
-            <p-button class="right" icon="pi pi-copy" [clipboard]="editor" (copied)="notify($event)"></p-button>
-            <!--<p-button icon="pi pi-pencil" (click)="modeEdition = !modeEdition"></p-button>-->
         </div>
     </div>
 </div>

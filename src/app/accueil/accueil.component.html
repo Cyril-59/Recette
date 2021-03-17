@@ -9,14 +9,17 @@
     <h1 class="" style="font-family: 'Open Sans'">Qu'est-ce qu'on mange ?</h1>
     <img style="height: 100px;" src="/assets/logo.png"/>
 </div>
-<p-tabView>
-    <p-tabPanel header="Produits" leftIcon="pi pi-list">
+<p-tabView [(activeIndex)]="index">
+    <p-tabPanel header="Produits" leftIcon="pi pi-apple">
         <app-produits (onProduits)="setProduits($event)"></app-produits>
     </p-tabPanel>
-    <p-tabPanel header="Recettes" leftIcon="pi pi-home">
+    <p-tabPanel header="Recettes" leftIcon="pi pi-list">
         <app-recettes [produits]="produits" (onRecettes)="setRecettes($event)"></app-recettes>
     </p-tabPanel>
-    <p-tabPanel header="Stocks & Courses" leftIcon="pi pi-shopping-cart">
-        <app-stocks [produits]="produits" [recettes]="recettes"></app-stocks>
+    <p-tabPanel header="Menu" leftIcon="pi pi-home">
+        <app-stocks [produits]="produits" [recettes]="recettes" (onCourses)="setText($event)"></app-stocks>
+    </p-tabPanel>
+    <p-tabPanel header="Courses" leftIcon="pi pi-shopping-cart">
+        <app-courses [text]="text"></app-courses>
     </p-tabPanel>
 </p-tabView>

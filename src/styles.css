@@ -31,6 +31,10 @@
     flex: 4;
 }
 
+.flex6 {
+    flex: 6;
+}
+
 .flex-wrap {
     display: flex;
     flex-wrap: wrap;
