@@ -1,4 +1,4 @@
-import { Component, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, OnInit, OnChanges, SimpleChanges, HostListener, AfterViewInit } from '@angular/core';
 import { ProduitService } from '../services/produit.service';
 import { Produit } from '../model/produit';
 import { SelectItem } from 'primeng/api/selectitem';
@@ -9,17 +9,27 @@ import { Recette } from '../model/recette';
   templateUrl: './accueil.component.html',
   styleUrls: ['./accueil.component.css']
 })
-export class AccueilComponent implements OnInit {
+export class AccueilComponent implements OnInit, AfterViewInit {
   produitReady = false;
   recetteReady = false;
   recettes: Recette[];
   produits: SelectItem[];
-  text: string;
+  text: string = 'Vide';
   index: number = 0;
+  innerWidth: number;
 
   constructor() { }
 
   ngOnInit(): void {
+  }
+
+  ngAfterViewInit(): void {
+    this.innerWidth = window.innerWidth;
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event) {
+    this.innerWidth = window.innerWidth;
   }
 
   setProduits(produits) {
@@ -36,6 +46,6 @@ export class AccueilComponent implements OnInit {
 
   setText(text) {
     this.text = text;
-    this.index = 3;
+    this.index = 1;
   }
 }

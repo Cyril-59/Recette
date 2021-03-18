@@ -14,6 +14,7 @@ import { MessageService } from 'primeng/api';
 export class RecettesComponent implements OnInit {
 
   @Input() produits: SelectItem[];
+  @Input() innerWidth: number;
   recette: Recette;
   recettes: Recette[];
   @Output() onRecettes = new EventEmitter<Recette[]>();
@@ -112,6 +113,9 @@ export class RecettesComponent implements OnInit {
     this.printemps = this.recette.printemps;
     this.edit = true;
     this.editTitle = 'Modification';
+    setTimeout(() => {
+      document.getElementById('editbox').scrollIntoView();
+    })
   }
 
   deleteRecette(id: number) {

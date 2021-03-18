@@ -12,6 +12,7 @@ import { MessageService } from 'primeng/api';
 export class StocksComponent implements OnInit, OnChanges {
   @Input() produits: SelectItem[];
   @Input() recettes: Recette[];
+  @Input() innerWidth: number;
   ingredients: Ingredient[];
   recettesMatch: Recette[];
   autresRecettes: Recette[];

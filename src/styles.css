@@ -1,12 +1,23 @@
 /* You can add global styles to this file, and also import other style files */
 
+p-table {
+    min-width: 325px;
+}
+
 /* MEDIA */
-@media (max-width: 1000px) {
+@media (max-width: 800px) {
     h1 {
         font-size: 1.5em;
     }
     label {
         font-size: 11px;
+    }
+    p-tabview li > a {
+        padding: .25em .25em !important;
+    }
+
+    p-tabview li > a > span {
+        margin-right: 0 !important;
     }
 }
 
@@ -64,6 +75,14 @@
 }
 
 /* PRIMENG */ 
+
+body {
+    background-color: bisque;
+}
+
+body .ui-tabview .ui-tabview-panels {
+    background-color: floralwhite !important;
+}
 
 body .ui-table .ui-table-tbody > tr {
     background-color: #e7f9e7 !important;

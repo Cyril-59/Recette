@@ -10,16 +10,16 @@
     <img style="height: 100px;" src="/assets/logo.png"/>
 </div>
 <p-tabView [(activeIndex)]="index">
-    <p-tabPanel header="Produits" leftIcon="pi pi-apple">
-        <app-produits (onProduits)="setProduits($event)"></app-produits>
-    </p-tabPanel>
-    <p-tabPanel header="Recettes" leftIcon="pi pi-list">
-        <app-recettes [produits]="produits" (onRecettes)="setRecettes($event)"></app-recettes>
-    </p-tabPanel>
     <p-tabPanel header="Menu" leftIcon="pi pi-home">
-        <app-stocks [produits]="produits" [recettes]="recettes" (onCourses)="setText($event)"></app-stocks>
+        <app-stocks [innerWidth]="innerWidth" [produits]="produits" [recettes]="recettes" (onCourses)="setText($event)"></app-stocks>
     </p-tabPanel>
     <p-tabPanel header="Courses" leftIcon="pi pi-shopping-cart">
         <app-courses [text]="text"></app-courses>
+    </p-tabPanel>
+    <p-tabPanel header="Produits" leftIcon="pi pi-apple">
+        <app-produits [innerWidth]="innerWidth" (onProduits)="setProduits($event)"></app-produits>
+    </p-tabPanel>
+    <p-tabPanel header="Recettes" leftIcon="pi pi-list">
+        <app-recettes [innerWidth]="innerWidth" [produits]="produits" (onRecettes)="setRecettes($event)"></app-recettes>
     </p-tabPanel>
 </p-tabView>

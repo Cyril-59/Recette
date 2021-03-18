@@ -15,3 +15,10 @@
 p-progressspinner {
     margin: auto;
 }
+
+@media (max-width: 800px) {
+    h1 {
+        width: 8em;
+        text-align: center;
+    }
+}
