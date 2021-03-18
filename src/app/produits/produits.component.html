@@ -6,7 +6,7 @@
     <div class="flex-wrap">
         <p-table class="flex3" #dt [value]="produits" dataKey="id" styleClass="ui-table-customers" [rowHover]="true"
             [rows]="10" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]"
-            [paginator]="true" currentPageReportTemplate="Eléments {first} à {last} sur un total de {totalRecords}"
+            [paginator]="true" currentPageReportTemplate="{first} à {last} sur {totalRecords}"
             [filterDelay]="0" [globalFilterFields]="['label', 'unite']">
             <ng-template pTemplate="header">
                 <tr>

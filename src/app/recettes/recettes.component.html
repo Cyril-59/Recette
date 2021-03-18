@@ -6,7 +6,7 @@
     <div class="flex-wrap">
         <p-table class="flex3" #dt [value]="recettes" dataKey="id" styleClass="ui-table-customers" [rowHover]="true"
         [rows]="10" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]"
-        [paginator]="true" currentPageReportTemplate="Eléments {first} à {last} sur un total de {totalRecords}"
+        [paginator]="true" currentPageReportTemplate="{first} à {last} sur {totalRecords}"
         [filterDelay]="0" [globalFilterFields]="['titre', 'stringIngredients']">
             <ng-template pTemplate="header">
                 <tr>
@@ -27,7 +27,9 @@
             <ng-template pTemplate="body" let-recipe>
                 <tr class="ui-selectable-row">
                     <td>
-                        {{recipe.titre}} <i pTooltip="Recherche Google" class="pi pi-google" (click)=goToUrl(recipe.url)></i>
+                        <div class="flex-between">
+                            <span>{{recipe.titre}}</span> <i pTooltip="Recherche Google" class="pi pi-google" (click)=goToUrl(recipe.url)></i>
+                        </div>
                     </td>
                     <td *ngIf="innerWidth > 600">
                         {{recipe.stringIngredients}} <i [pTooltip]="recipe.tooltipIngredients" class="pi pi-info"></i>
@@ -56,7 +58,7 @@
                 <div class="ui-g bottom">
                     <p-dropdown class="right" [filter]="true" [options]="produits" [(ngModel)]="ingredient.produit" placeholder="Produit"></p-dropdown>
                     <input id="input" type="text" size="1" pInputText [(ngModel)]="ingredient.quantite" placeholder="Qtt">
-                    <input *ngIf="!!ingredient.produit" id="input" type="text" size="6" pInputText [(ngModel)]="ingredient.produit.unite" [disabled]="true">
+                    <input *ngIf="!!ingredient.produit" id="input" class="no-border" type="text" size="6" pInputText [(ngModel)]="ingredient.produit.unite" [disabled]="true">
                     <p-button class="left" icon="pi pi-trash" (click)="enleverIngredient(idx)"></p-button>
                 </div>
             </ng-container>

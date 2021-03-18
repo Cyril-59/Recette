@@ -92,6 +92,10 @@ p-table {
     align-self: flex-end;
 }
 
+.no-border {
+    border: none !important;
+}
+
 /* PRIMENG */ 
 
 body {

@@ -30,11 +30,11 @@
             </div>
             <p-table #dt [value]="recettesMatch" [(selection)]="selectedRecipes" dataKey="id" styleClass="ui-table-customers" [rowHover]="true"
         [rows]="10" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]"
-        [paginator]="true" currentPageReportTemplate="Eléments {first} à {last} sur un total de {totalRecords}"
+        [paginator]="true" currentPageReportTemplate="{first} à {last} sur {totalRecords}"
         [filterDelay]="0" [globalFilterFields]="['titre', 'stringIngredients']">
             <ng-template pTemplate="header">
                 <tr>
-                    <th style="width: 5em;">Sélection</th>
+                    <th style="width: 3em;"><i class="pi pi-check"></i></th>
                     <th pSortableColumn="titre">Titre <p-sortIcon field="label"></p-sortIcon></th>
                     <th *ngIf="innerWidth > 600">Ingrédients</th>
                 </tr>
@@ -56,7 +56,9 @@
                         <p-tableCheckbox [value]="recipe"></p-tableCheckbox>
                     </td>
                     <td>
-                        {{recipe.titre}} <i pTooltip="Recherche Google" class="pi pi-google" (click)=goToUrl(recipe.url)></i> <i *ngIf="innerWidth <= 600" [pTooltip]="recipe.tooltipIngredients" class="pi pi-info"></i>
+                        <div class="flex-between">
+                            <span>{{recipe.titre}}</span> <span class="flex-between"><i pTooltip="Recherche Google" class="pi pi-google" (click)=goToUrl(recipe.url)></i> <i *ngIf="innerWidth <= 600" [pTooltip]="recipe.tooltipIngredients" class="pi pi-info"></i></span>
+                        </div>
                     </td>
                     <td *ngIf="innerWidth > 600">
                         {{recipe.stringIngredients}}
