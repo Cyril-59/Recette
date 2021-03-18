@@ -3,7 +3,7 @@
         <div class="flex-column">
             <div class="flex-between">
                 <h1>Menu de la semaine</h1>
-                <img style="width: 125px;" src="/assets/fridge.png">
+                <img style="width: 100px;" src="/assets/fridge.png">
             </div>
 
             <h2>Ce que j'ai en stock</h2>
@@ -24,8 +24,10 @@
             </div>
         </div>
         <div *ngIf="recettesMatch">
-            <h2>Recettes proposées</h2>
-            <p-button class="margin" icon="pi pi-trash" (click)="recettesMatch = null;selectedRecipes = []"></p-button>
+            <div class="flex-between">
+                <h2>Recettes proposées</h2>
+                <p-button class="margin" icon="pi pi-trash" (click)="recettesMatch = null;selectedRecipes = []"></p-button>
+            </div>
             <p-table #dt [value]="recettesMatch" [(selection)]="selectedRecipes" dataKey="id" styleClass="ui-table-customers" [rowHover]="true"
         [rows]="10" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]"
         [paginator]="true" currentPageReportTemplate="Eléments {first} à {last} sur un total de {totalRecords}"

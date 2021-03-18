@@ -1,16 +1,13 @@
 /* You can add global styles to this file, and also import other style files */
 
 p-table {
-    min-width: 325px;
+    min-width: 300px;
 }
 
 /* MEDIA */
 @media (max-width: 800px) {
     h1 {
         font-size: 1.5em;
-    }
-    label {
-        font-size: 11px;
     }
     p-tabview li > a {
         padding: .25em .25em !important;
@@ -19,6 +16,27 @@ p-table {
     p-tabview li > a > span {
         margin-right: 0 !important;
     }
+}
+
+@media (max-width: 400px) {
+    .left {
+        margin-left: 0;
+    }
+    p-button[icon="pi pi-trash"] button {
+        width: 1em !important;
+    }
+}
+@media (min-width: 400px) {
+    .left {
+        margin-left: .5em;
+    }
+    p-button[icon="pi pi-trash"] button {
+        width: 2em !important;
+    }
+}
+
+.right {
+    margin-right: .5em !important;
 }
 
 /* FLEX */
@@ -77,7 +95,7 @@ p-table {
 /* PRIMENG */ 
 
 body {
-    background-color: bisque;
+    background-color: lightblue;
 }
 
 body .ui-tabview .ui-tabview-panels {
@@ -85,10 +103,10 @@ body .ui-tabview .ui-tabview-panels {
 }
 
 body .ui-table .ui-table-tbody > tr {
-    background-color: #e7f9e7 !important;
+    background-color: #e1eef3 !important;
 }
 body .ui-table .ui-table-tbody > tr:nth-child(even) {
-    background-color: #bbeebb !important;
+    background-color: #b8dcf9 !important;
 }
 
 body .ui-button.ui-state-default.ui-button-secondary, body .ui-buttonset.ui-button-secondary > .ui-button.ui-state-default {

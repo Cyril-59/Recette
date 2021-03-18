@@ -15,7 +15,6 @@ export class ClipboardDirective {
   public onClick(event: MouseEvent): void {
 
     event.preventDefault();
-    console.log(this.editorRef);
     
     const text = this.editorRef.getQuill().getText();
     if (!text)
