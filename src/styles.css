@@ -2,6 +2,7 @@
 
 p-table {
     min-width: 300px;
+    max-width: 1800px;
 }
 
 /* MEDIA */
@@ -96,7 +97,11 @@ p-table {
     border: none !important;
 }
 
-/* PRIMENG */ 
+.gap {
+  gap: 2em;
+}
+
+/* PRIMENG */
 
 body {
     background-color: lightblue;

@@ -13,7 +13,9 @@ export class StocksComponent implements OnInit, OnChanges {
   @Input() produits: SelectItem[];
   @Input() recettes: Recette[];
   @Input() innerWidth: number;
+  @Input() recettesCourses: Recette[];
   ingredients: Ingredient[];
+  ingredientsAutres: Ingredient[];
   recettesMatch: Recette[];
   autresRecettes: Recette[];
   recettesSaison: Recette[];
@@ -47,10 +49,15 @@ export class StocksComponent implements OnInit, OnChanges {
     }
     this.initStock();
     this.initRecette();
+    this.initIngredientsAutres();
   }
 
   initStock() {
     this.ingredients = [new Ingredient()];
+  }
+
+  initIngredientsAutres() {
+    this.ingredientsAutres = [new Ingredient()];
   }
 
   initRecette() {
@@ -68,7 +75,7 @@ export class StocksComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (!!changes['recettes'] && !!changes['recettes'].currentValue) {
-      this.optionsSaisons = this.recettes.filter(r => r.automne && this.mois.includes('automne') || 
+      this.optionsSaisons = this.recettes.filter(r => r.automne && this.mois.includes('automne') ||
         r.ete && this.mois.includes('ete') ||
         r.hiver && this.mois.includes('hiver') ||
         r.printemps && this.mois.includes('printemps')
@@ -99,7 +106,7 @@ export class StocksComponent implements OnInit, OnChanges {
               match = true;
               matchValue++;
             }
-          } 
+          }
         }
         if (match) {
           if (matchValues.length === 0) {
@@ -126,8 +133,16 @@ export class StocksComponent implements OnInit, OnChanges {
     this.ingredients.push(new Ingredient());
   }
 
+  ajouterIngredientAutres() {
+      this.ingredientsAutres.push(new Ingredient());
+    }
+
   enleverIngredient(idx: number) {
     this.ingredients.splice(idx, 1);
+  }
+
+  enleverIngredientAutres(idx: number) {
+    this.ingredientsAutres.splice(idx, 1);
   }
 
   ajouterRecette(cpt: number) {
@@ -158,7 +173,17 @@ export class StocksComponent implements OnInit, OnChanges {
       selectedRecettes.push(...this.autresRecettes);
     }
 
+    /*const test = new Recette();
+    test.ingredients = [];
+    const test2 = new Ingredient();
+    test2.quantite = 1;
+    console.log(this.produits[0].value);
+    test2.produit = this.produits[0].value;
+    test.ingredients.push(test2);
+    selectedRecettes.push(test);*/
+
     const map = new Map<string, number>();
+    // On ajoute les produits des recettes sélectionnées
     for (const recette of selectedRecettes) {
       if (!!recette.ingredients) {
         for (const ingredient of recette.ingredients) {
@@ -171,6 +196,7 @@ export class StocksComponent implements OnInit, OnChanges {
         }
       }
     }
+    // On retire les produits du stock restant
     for (const stock of this.ingredients) {
       if (!!stock.quantite) {
         const produit = JSON.stringify(stock.produit);
@@ -181,6 +207,19 @@ export class StocksComponent implements OnInit, OnChanges {
         }
       }
     }
+
+    // On ajoute les produits en plus
+    for (const ingredient of this.ingredientsAutres) {
+      if (!!ingredient.quantite) {
+        const produit = JSON.stringify(ingredient.produit);
+        if (map.has(produit)) {
+          map.set(produit, map.get(produit) + +ingredient.quantite);
+        } else {
+          map.set(produit, ingredient.quantite);
+        }
+      }
+    }
+
     const courses = new Map<string, Ingredient[]>();
     map.forEach((value: number, key: string) => {
       if (value > 0) {
@@ -198,35 +237,61 @@ export class StocksComponent implements OnInit, OnChanges {
     });
     this.courses = courses;
 
-    /*let copy = '';
+    let copy = '<p>Recettes<br/>';
+    for (const recipe of selectedRecettes) {
+      if (recipe.titre) {
+        copy += '-&nbsp;&nbsp;' + recipe.titre;
+        let first = true;
+        for (const ing of recipe.ingredients) {
+          if (ing.produit.type == 'légume') {
+            if (first) {
+              copy += ' (';
+            }
+            if (!first) {
+              copy += ', ';
+            }
+            copy += ing.quantite;
+            if (ing.produit.unite != 'pièce(s)') {
+              if (ing.produit.unite == 'grammes') {
+                copy += 'g';
+              } else {
+                copy += ing.produit.unite;
+              }
+            }
+            copy += ' ' + ing.produit.label;
+            if (first) {
+              first = false;
+            }
+          }
+        }
+        if (!first) {
+          copy += ')';
+        }
+        copy += '<br/>';
+      }
+    }
+    copy += '<br/>';
     let first = true;
     this.courses.forEach((value: Ingredient[], key: string) => {
       if (first) {
         first = false;
       } else {
-        copy += '\n';  
+        copy += '<br/>';
       }
-      copy += key + '\n';
-      for (const ingredient of value) {
-          copy += '-\t' + ingredient.produit.label + ' - ' + ingredient.quantite + ' ' + ingredient.produit.unite + '\n';
-      }
-    });*/
-
-    let copy = '<p>';
-    let first = true;
-    this.courses.forEach((value: Ingredient[], key: string) => {
-      if (first) {
-        first = false;
-      } else {
-        copy += '<br/>';  
-      }
-      copy += key + '<br/>';
+      copy += key.charAt(0).toUpperCase() + key.slice(1) + '<br/>';
       for (const ingredient of value) {
           copy += '-&nbsp;&nbsp;' + ingredient.produit.label + ' - ' + ingredient.quantite + ' ' + ingredient.produit.unite + '<br/>';
       }
     });
 
     this.onCourses.emit(copy + '</p>');
+
+    this.recettesCourses.length = 0;
+    for (const recette of selectedRecettes) {
+    if (recette.titre) {
+      this.recettesCourses.push(recette);
+      }
+    }
   }
 
   goToUrl(url) {

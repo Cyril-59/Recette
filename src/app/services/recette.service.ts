@@ -12,18 +12,18 @@ export class RecetteService {
   }
 
   getRecettes(): Observable<Recette[]> {
-    return this.http.get<Recette[]>('https://qqm-back.herokuapp.com/api/recettes');
+    return this.http.get<Recette[]>('http://localhost:8080/api/recettes');
   }
 
   createRecette(recette: Recette): Observable<Recette> {
-    return this.http.post<Recette>('https://qqm-back.herokuapp.com/api/recettes', recette);
+    return this.http.post<Recette>('http://localhost:8080/api/recettes', recette);
   }
 
   updateRecette(recette: Recette): Observable<Recette> {
-    return this.http.put<Recette>('https://qqm-back.herokuapp.com/api/recettes/'+ recette.id , recette);
+    return this.http.put<Recette>('http://localhost:8080/api/recettes/'+ recette.id , recette);
   }
 
   deleteRecette(id: number): Observable<Recette> {
-    return this.http.delete<Recette>('https://qqm-back.herokuapp.com/api/recettes/'+ id);
+    return this.http.delete<Recette>('http://localhost:8080/api/recettes/'+ id);
   }
 }

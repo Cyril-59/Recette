@@ -3,10 +3,23 @@
         <h1>Liste de courses</h1>
         <img style="width: 100px;" src="/assets/basket.png">
     </div>
-    <div>
+  <div class="flex-between">
+    <div class="grow">
         <p-editor #editor [(ngModel)]="text"></p-editor>
     </div>
-    <div class="flex-end">
+    <!--<div class="grow bigleft" *ngIf="recettes">
+      <h2>Recettes sélectionnées</h2>
+      <ul #rec>
+        <li *ngFor="let recette of recettes">{{ recette.titre }}
+          (<ng-container *ngFor="let ingredient of recette.ingredients; let first = first;"><ng-container *ngIf="ingredient.produit.type == 'légume'"><ng-container *ngIf="!first">, </ng-container>{{ ingredient.quantite }} <ng-container *ngIf="ingredient.produit.unite != 'pièce(s)'">{{ ingredient.produit.unite }}</ng-container> {{ ingredient.produit.label }}</ng-container></ng-container>)
+        </li>
+      </ul>
+    </div>-->
+  </div>
+    <div class="flex-between">
+        <a href="https://www.leclercdrive.fr/" target="_blank">
+          <img style="mix-blend-mode: multiply" src="https://mgt.leclercdrive.fr/communiques/visuelpagescontenu.ashx?id=340&type=2&mindim=60" />
+        </a>
         <p-button class="right top" icon="pi pi-copy" [clipboard]="editor" (copied)="notify($event)"></p-button>
     </div>
 </div>

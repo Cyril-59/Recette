@@ -1,116 +1,146 @@
 <div>
-    <div>
-        <div class="flex-column">
-            <div class="flex-between">
-                <h1>Menu de la semaine</h1>
-                <img style="width: 100px;" src="/assets/fridge.png">
-            </div>
-
-            <h2>Ce que j'ai en stock</h2>
-            <ng-container *ngFor="let ingredient of ingredients; index as idx">
-                <div class="bottom">
-                    <p-dropdown class="right" [filter]="true" [options]="produits" [(ngModel)]="ingredient.produit" placeholder="Produit"></p-dropdown>
-                    <input id="input" type="text" size="1" pInputText [(ngModel)]="ingredient.quantite" placeholder="Qtt">
-                    <input *ngIf="!!ingredient.produit" class="no-border" id="input" type="text" size="6" pInputText [(ngModel)]="ingredient.produit.unite" [disabled]="true">
-                    <p-button class="left" icon="pi pi-trash" (click)="enleverIngredient(idx)"></p-button>
-                </div>
-            </ng-container>
-            <div>
-                <p-button class="right" icon="pi pi-plus" (click)="ajouterIngredient()"></p-button>
-                <p-button icon="pi pi-undo" (click)="initStock()"></p-button>
-            </div>
-            <div class="bottom" style="margin-top: 1em;">
-                <p-button label="Quelles recettes avec ce stock ?" (click)="proposerRecettes()"></p-button>
-            </div>
-        </div>
-        <div *ngIf="recettesMatch">
-            <div class="flex-between">
-                <h2>Recettes proposées</h2>
-                <p-button class="margin" icon="pi pi-trash" (click)="recettesMatch = null;selectedRecipes = []"></p-button>
-            </div>
-            <p-table #dt [value]="recettesMatch" [(selection)]="selectedRecipes" dataKey="id" styleClass="ui-table-customers" [rowHover]="true"
-        [rows]="10" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]"
-        [paginator]="true" currentPageReportTemplate="{first} à {last} sur {totalRecords}"
-        [filterDelay]="0" [globalFilterFields]="['titre', 'stringIngredients']">
-            <ng-template pTemplate="header">
-                <tr>
-                    <th style="width: 3em;"><i class="pi pi-check"></i></th>
-                    <th pSortableColumn="titre">Titre <p-sortIcon field="label"></p-sortIcon></th>
-                    <th *ngIf="innerWidth > 600">Ingrédients</th>
-                </tr>
-                <tr>
-                    <th>
-                        <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
-                    </th>
-                    <th>
-                        <input pInputText type="text" (input)="dt.filter($event.target.value, 'titre', 'startsWith')" placeholder="Recherche par titre" class="ui-column-filter">
-                    </th>
-                    <th *ngIf="innerWidth > 600">
-                        <input pInputText type="text" (input)="dt.filter($event.target.value, 'stringIngredients', 'contains')" placeholder="Recherche par produit" class="ui-column-filter">
-                    </th>
-                </tr>
-            </ng-template>
-            <ng-template pTemplate="body" let-recipe>
-                <tr class="ui-selectable-row">
-                    <td>
-                        <p-tableCheckbox [value]="recipe"></p-tableCheckbox>
-                    </td>
-                    <td>
-                        <div class="flex-between">
-                            <span>{{recipe.titre}}</span> <span class="flex-between"><i pTooltip="Recherche Google" class="pi pi-google" (click)=goToUrl(recipe.url)></i> <i *ngIf="innerWidth <= 600" [pTooltip]="recipe.tooltipIngredients" class="pi pi-info"></i></span>
-                        </div>
-                    </td>
-                    <td *ngIf="innerWidth > 600">
-                        {{recipe.stringIngredients}}
-                    </td>
-                </tr>
-            </ng-template>
-            <ng-template pTemplate="emptymessage">
-                <tr>
-                    <td colspan="8" style="text-align:left">No products found.</td>
-                </tr>
-            </ng-template>
-        </p-table>
-        </div>
-        <div class="flex">
-            <div class="flex1"></div>
-            <div class="flex6 bord-top"></div>
-            <div class="flex1"></div>
-        </div>
-        <div>
-            <h2>Recettes de saison</h2>
-            <ng-container *ngFor="let recetteSaison of recettesSaison; index as idx">
-                <div class="ui-g bottom">
-                    <p-dropdown class="right" [filter]="true" [options]="optionsSaisons" [(ngModel)]="recettesSaison[idx]" placeholder="Recette"></p-dropdown>
-                    <p-button icon="pi pi-trash" (click)="enleverRecette(idx, 1)"></p-button>
-                </div>
-            </ng-container>
-            <div>
-                <p-button class="bottom right" icon="pi pi-plus" (click)="ajouterRecette(1)"></p-button>
-                <p-button icon="pi pi-undo" (click)="initRecetteSaison()"></p-button>
-            </div>
-        </div>
-        <div class="flex">
-            <div class="flex1"></div>
-            <div class="flex6 bord-top"></div>
-            <div class="flex1"></div>
-        </div>
-        <div>
-            <h2>Autres recettes</h2>
-            <ng-container *ngFor="let autreRecette of autresRecettes; index as idx">
-                <div class="ui-g bottom">
-                    <p-dropdown class="right" [filter]="true" [options]="options" [(ngModel)]="autresRecettes[idx]" placeholder="Recette"></p-dropdown>
-                    <p-button icon="pi pi-trash" (click)="enleverRecette(idx, 2)"></p-button>
-                </div>
-            </ng-container>
-            <div>
-                <p-button class="bottom right" icon="pi pi-plus" (click)="ajouterRecette(2)"></p-button>
-                <p-button icon="pi pi-undo" (click)="initAutreRecette()"></p-button>
-            </div>
-            <p class="ui-g" style="flex-direction: row-reverse;">Recette(s) : {{ getNbRecettes() }}</p>
-            <div class="ui-g bottom" style="flex-direction: row-reverse; margin-top: 1em;">
-                <p-button icon="pi pi-shopping-cart" label="Calculer les courses" (click)="calculerCourses()"></p-button>
-            </div>
-        </div>
+  <div>
+    <div class="flex-column">
+      <div class="flex-between">
+        <h1>Menu de la semaine</h1>
+        <img style="width: 100px;" src="/assets/fridge.png">
+      </div>
     </div>
+    <div class="flex-around">
+      <div>
+        <h2>Recettes de saison</h2>
+        <ng-container *ngFor="let recetteSaison of recettesSaison; index as idx">
+          <div class="ui-g bottom">
+            <p-dropdown class="right" [filter]="true" [options]="optionsSaisons" [(ngModel)]="recettesSaison[idx]"
+                        placeholder="Recette"></p-dropdown>
+            <p-button icon="pi pi-trash" (click)="enleverRecette(idx, 1)"></p-button>
+          </div>
+        </ng-container>
+        <div>
+          <p-button class="bottom right" icon="pi pi-plus" (click)="ajouterRecette(1)"></p-button>
+          <p-button icon="pi pi-undo" (click)="initRecetteSaison()"></p-button>
+        </div>
+      </div>
+      <!--<div class="flex">
+          <div class="flex1"></div>
+          <div class="flex6 bord-top"></div>
+          <div class="flex1"></div>
+      </div>-->
+      <div>
+        <h2>Autres recettes</h2>
+        <ng-container *ngFor="let autreRecette of autresRecettes; index as idx">
+          <div class="ui-g bottom">
+            <p-dropdown class="right" [filter]="true" [options]="options" [(ngModel)]="autresRecettes[idx]"
+                        placeholder="Recette"></p-dropdown>
+            <p-button icon="pi pi-trash" (click)="enleverRecette(idx, 2)"></p-button>
+          </div>
+        </ng-container>
+        <div>
+          <p-button class="bottom right" icon="pi pi-plus" (click)="ajouterRecette(2)"></p-button>
+          <p-button icon="pi pi-undo" (click)="initAutreRecette()"></p-button>
+        </div>
+      </div>
+      <div>
+        <h2>Ce que j'ai en stock</h2>
+        <ng-container *ngFor="let ingredient of ingredients; index as idx">
+          <div class="bottom">
+            <p-dropdown class="right" [filter]="true" [options]="produits" [(ngModel)]="ingredient.produit"
+                        placeholder="Produit"></p-dropdown>
+            <input id="input" type="text" size="1" pInputText [(ngModel)]="ingredient.quantite" placeholder="Qtt">
+            <input *ngIf="!!ingredient.produit" class="no-border" id="input" type="text" size="6" pInputText
+                   [(ngModel)]="ingredient.produit.unite" [disabled]="true">
+            <p-button class="left" icon="pi pi-trash" (click)="enleverIngredient(idx)"></p-button>
+          </div>
+        </ng-container>
+        <div>
+          <p-button class="right" icon="pi pi-plus" (click)="ajouterIngredient()"></p-button>
+          <p-button icon="pi pi-undo" (click)="initStock()"></p-button>
+        </div>
+        <div class="bottom" style="margin-top: 1em;">
+          <p-button label="Quelles recettes avec ce stock ?" (click)="proposerRecettes()"></p-button>
+        </div>
+      </div>
+      <div>
+        <h2>Autres produits</h2>
+        <ng-container *ngFor="let ingredient of ingredientsAutres; index as idx">
+          <div class="bottom">
+            <p-dropdown class="right" [filter]="true" [options]="produits" [(ngModel)]="ingredient.produit"
+                        placeholder="Produit"></p-dropdown>
+            <input id="input" type="text" size="1" pInputText [(ngModel)]="ingredient.quantite" placeholder="Qtt">
+            <input *ngIf="!!ingredient.produit" class="no-border" id="input" type="text" size="6" pInputText
+                   [(ngModel)]="ingredient.produit.unite" [disabled]="true">
+            <p-button class="left" icon="pi pi-trash" (click)="enleverIngredientAutres(idx)"></p-button>
+          </div>
+        </ng-container>
+        <div>
+          <p-button class="right" icon="pi pi-plus" (click)="ajouterIngredientAutres()"></p-button>
+          <p-button icon="pi pi-undo" (click)="initIngredientsAutres()"></p-button>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="recettesMatch">
+      <div class="flex-between">
+        <h2>Recettes proposées</h2>
+        <p-button class="margin" icon="pi pi-trash" (click)="recettesMatch = null;selectedRecipes = []"></p-button>
+      </div>
+      <p-table #dt [value]="recettesMatch" [(selection)]="selectedRecipes" dataKey="id" styleClass="ui-table-customers"
+               [rowHover]="true"
+               [rows]="10" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]"
+               [paginator]="true" currentPageReportTemplate="{first} à {last} sur {totalRecords}"
+               [filterDelay]="0" [globalFilterFields]="['titre', 'stringIngredients']">
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 3em;"><i class="pi pi-check"></i></th>
+            <th pSortableColumn="titre">Titre
+              <p-sortIcon field="label"></p-sortIcon>
+            </th>
+            <th *ngIf="innerWidth > 600">Ingrédients</th>
+          </tr>
+          <tr>
+            <th>
+              <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+            </th>
+            <th>
+              <input pInputText type="text" (input)="dt.filter($event.target.value, 'titre', 'startsWith')"
+                     placeholder="Recherche par titre" class="ui-column-filter">
+            </th>
+            <th *ngIf="innerWidth > 600">
+              <input pInputText type="text" (input)="dt.filter($event.target.value, 'stringIngredients', 'contains')"
+                     placeholder="Recherche par produit" class="ui-column-filter">
+            </th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-recipe>
+          <tr class="ui-selectable-row">
+            <td>
+              <p-tableCheckbox [value]="recipe"></p-tableCheckbox>
+            </td>
+            <td>
+              <div class="flex-between">
+                <span>{{recipe.titre}}</span> <span class="flex-between"><i pTooltip="Recherche Google"
+                                                                            class="pi pi-google"
+                                                                            (click)=goToUrl(recipe.url)></i> <i
+                *ngIf="innerWidth <= 600" [pTooltip]="recipe.tooltipIngredients" class="pi pi-info"></i></span>
+              </div>
+            </td>
+            <td *ngIf="innerWidth > 600">
+              {{recipe.stringIngredients}}
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="8" style="text-align:left">No products found.</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+    <div>
+      <p class="ui-g" style="flex-direction: row-reverse;">Recette(s) : {{ getNbRecettes() }}</p>
+      <div class="ui-g bottom" style="flex-direction: row-reverse; margin-top: 1em;">
+        <p-button icon="pi pi-shopping-cart" label="Calculer les courses" (click)="calculerCourses()"></p-button>
+      </div>
+    </div>
+  </div>
 </div>

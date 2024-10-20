@@ -6,6 +6,10 @@
     margin-left: 1em;
 }
 
+.bigleft {
+    margin-left: 4em;
+}
+
 .size {
     width: 14em;
 }
@@ -38,4 +42,8 @@ textarea {
     font-size: 14px;
     min-width: 88em;
     min-height: 77em;
+}
+
+.grow {
+  flex-grow: 1;
 }

@@ -14,6 +14,7 @@ export class AccueilComponent implements OnInit, AfterViewInit {
   recetteReady = false;
   recettes: Recette[];
   produits: SelectItem[];
+  recettesCourses: Recette[] = [];
   text: string = 'Vide';
   index: number = 0;
   innerWidth: number;

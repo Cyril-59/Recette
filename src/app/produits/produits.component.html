@@ -3,7 +3,7 @@
         <h1>Liste des produits</h1>
         <div id="vegetables"></div>
     </div>
-    <div class="flex-wrap">
+    <div class="flex-wrap gap">
         <p-table class="flex3" #dt [value]="produits" dataKey="id" styleClass="ui-table-customers" [rowHover]="true"
             [rows]="10" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]"
             [paginator]="true" currentPageReportTemplate="{first} à {last} sur {totalRecords}"

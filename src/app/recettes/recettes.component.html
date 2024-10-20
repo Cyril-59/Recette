@@ -3,7 +3,7 @@
         <h1>Liste des recettes</h1>
         <div id="recipes"></div>
     </div>
-    <div class="flex-wrap">
+    <div class="flex-wrap gap">
         <p-table class="flex3" #dt [value]="recettes" dataKey="id" styleClass="ui-table-customers" [rowHover]="true"
         [rows]="10" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]"
         [paginator]="true" currentPageReportTemplate="{first} à {last} sur {totalRecords}"
@@ -12,6 +12,7 @@
                 <tr>
                     <th pSortableColumn="titre">Titre <p-sortIcon field="label"></p-sortIcon></th>
                     <th *ngIf="innerWidth > 600">Ingrédients</th>
+                    <th *ngIf="innerWidth > 600">Saisons</th>
                     <th style="width: 8em;">Actions</th>
                 </tr>
                 <tr>
@@ -20,6 +21,12 @@
                     </th>
                     <th *ngIf="innerWidth > 600">
                         <input pInputText type="text" (input)="dt.filter($event.target.value, 'stringIngredients', 'contains')" placeholder="Recherche par produit" class="ui-column-filter">
+                    </th>
+                    <th *ngIf="innerWidth > 600" class="flex-wrap">
+                      <p-checkbox label="Pri." binary="true" (onChange)="$event ? dt.filter($event, 'printemps', 'equals') : dt.reset()"></p-checkbox>
+                      <p-checkbox label="Eté." binary="true" (onChange)="$event ? dt.filter($event, 'ete', 'equals') : dt.reset()"></p-checkbox>
+                      <p-checkbox label="Aut." binary="true" (onChange)="$event ? dt.filter($event, 'automne', 'equals') : dt.reset()"></p-checkbox>
+                      <p-checkbox label="Hiv." binary="true" (onChange)="$event ? dt.filter($event, 'hiver', 'equals') : dt.reset()"></p-checkbox>
                     </th>
                     <th></th>
                 </tr>
@@ -33,6 +40,12 @@
                     </td>
                     <td *ngIf="innerWidth > 600">
                         {{recipe.stringIngredients}} <i [pTooltip]="recipe.tooltipIngredients" class="pi pi-info"></i>
+                    </td>
+                    <td *ngIf="innerWidth > 600">
+                        {{recipe.printemps ? 'printemps' : ''}}
+                        {{recipe.ete ? 'été' : ' '}}
+                        {{recipe.automne ? 'automne' : ' '}}
+                        {{recipe.hiver ? 'hiver' : ''}}
                     </td>
                     <td>
                         <button pButton type="button" class="ui-button-secondary right" icon="pi pi-pencil" (click)="recipeSelected(recipe.id)"></button>
@@ -70,6 +83,7 @@
                 <div><p-checkbox [(ngModel)]="automne" label="Automne" binary="true"></p-checkbox></div>
                 <div><p-checkbox [(ngModel)]="hiver" label="Hiver" binary="true"></p-checkbox></div>
             </div>
+            <p class="ui-g" style="flex-direction: row-reverse;">Ingrédient(s) : {{ getNbIngredients() }}</p>
             <div class="flex-end">
                 <p-button icon="pi pi-undo" (click)="initRecette()"></p-button>
                 <p-button icon="pi pi-check" label="Créer/Modifier la recette" (click)="creerRecette()"></p-button>

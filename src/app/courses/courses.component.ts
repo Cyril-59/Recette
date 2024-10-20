@@ -1,5 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { MessageService } from 'primeng/api';
+import { Recette } from '../model/recette';
 
 @Component({
   selector: 'app-courses',
@@ -8,6 +9,7 @@ import { MessageService } from 'primeng/api';
 })
 export class CoursesComponent implements OnInit {
   @Input() text: string;
+  @Input() recettes: Recette[];
 
   constructor(public messageService: MessageService) { }
 

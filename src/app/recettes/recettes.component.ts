@@ -149,4 +149,14 @@ export class RecettesComponent implements OnInit {
       }
     })
   }
+
+  getNbIngredients() {
+    let nb = 0;
+    for (const ing of this.recette.ingredients) {
+      if (ing.produit && ing.produit.label) {
+        nb++;
+      }
+    }
+    return nb;
+  }
 }
