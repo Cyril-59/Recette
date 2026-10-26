@@ -1,94 +1,179 @@
-<div>
-    <div class="flex-between">
-        <h1>Liste des recettes</h1>
-        <div id="recipes"></div>
+<div class="page-container">
+  <div class="page-header flex-between">
+    <div>
+      <h1 class="page-title">Recettes</h1>
+      <p class="page-subtitle">Découvrez et organisez vos recettes favorites</p>
     </div>
-    <div class="flex-wrap gap">
-        <p-table class="flex3" #dt [value]="recettes" dataKey="id" styleClass="ui-table-customers" [rowHover]="true"
-        [rows]="10" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]"
-        [paginator]="true" currentPageReportTemplate="{first} à {last} sur {totalRecords}"
-        [filterDelay]="0" [globalFilterFields]="['titre', 'stringIngredients']">
-            <ng-template pTemplate="header">
-                <tr>
-                    <th pSortableColumn="titre">Titre <p-sortIcon field="label"></p-sortIcon></th>
-                    <th *ngIf="innerWidth > 600">Ingrédients</th>
-                    <th *ngIf="innerWidth > 600">Saisons</th>
-                    <th style="width: 8em;">Actions</th>
-                </tr>
-                <tr>
-                    <th>
-                        <input pInputText type="text" (input)="dt.filter($event.target.value, 'titre', 'startsWith')" placeholder="Recherche par titre" class="ui-column-filter">
-                    </th>
-                    <th *ngIf="innerWidth > 600">
-                        <input pInputText type="text" (input)="dt.filter($event.target.value, 'stringIngredients', 'contains')" placeholder="Recherche par produit" class="ui-column-filter">
-                    </th>
-                    <th *ngIf="innerWidth > 600" class="flex-wrap">
-                      <p-checkbox label="Pri." binary="true" (onChange)="$event ? dt.filter($event, 'printemps', 'equals') : dt.reset()"></p-checkbox>
-                      <p-checkbox label="Eté." binary="true" (onChange)="$event ? dt.filter($event, 'ete', 'equals') : dt.reset()"></p-checkbox>
-                      <p-checkbox label="Aut." binary="true" (onChange)="$event ? dt.filter($event, 'automne', 'equals') : dt.reset()"></p-checkbox>
-                      <p-checkbox label="Hiv." binary="true" (onChange)="$event ? dt.filter($event, 'hiver', 'equals') : dt.reset()"></p-checkbox>
-                    </th>
-                    <th></th>
-                </tr>
-            </ng-template>
-            <ng-template pTemplate="body" let-recipe>
-                <tr class="ui-selectable-row">
-                    <td>
-                        <div class="flex-between">
-                            <span>{{recipe.titre}}</span> <i pTooltip="Recherche Google" class="pi pi-google" (click)=goToUrl(recipe.url)></i>
-                        </div>
-                    </td>
-                    <td *ngIf="innerWidth > 600">
-                        {{recipe.stringIngredients}} <i [pTooltip]="recipe.tooltipIngredients" class="pi pi-info"></i>
-                    </td>
-                    <td *ngIf="innerWidth > 600">
-                        {{recipe.printemps ? 'printemps' : ''}}
-                        {{recipe.ete ? 'été' : ' '}}
-                        {{recipe.automne ? 'automne' : ' '}}
-                        {{recipe.hiver ? 'hiver' : ''}}
-                    </td>
-                    <td>
-                        <button pButton type="button" class="ui-button-secondary right" icon="pi pi-pencil" (click)="recipeSelected(recipe.id)"></button>
-                        <button pButton type="button" class="ui-button-secondary" icon="pi pi-trash" (click)="deleteRecette(recipe.id)"></button>
-                    </td>
-                </tr>
-            </ng-template>
-            <ng-template pTemplate="emptymessage">
-                <tr>
-                    <td colspan="8" style="text-align:left">Aucune recette.</td>
-                </tr>
-            </ng-template>
-        </p-table>
+    <p-button class="desktop-only" icon="pi pi-plus" label="Ajouter une recette" (click)="initRecette(); edit = true"></p-button>
+  </div>
 
-        <div *ngIf="edit" class="flex-column flex-start flex1" style="min-width: 310px" id="editbox">
-            <div class="flex-between">
-                <h2>{{ editTitle }}</h2>
-                <i class="pi pi-times" style="font-size: 2em;" (click)="edit = !edit"></i>
-            </div>
+  <!-- Search & Filters Card -->
+  <div class="app-card filters-card">
+    <div class="search-input-wrapper">
+      <i class="pi pi-search search-icon"></i>
+      <input pInputText type="text" (input)="dt.filterGlobal($event.target.value, 'contains')" placeholder="Rechercher par titre ou ingrédient..." class="search-input">
+    </div>
+    <div class="season-filters">
+      <span class="filter-label">Saisons :</span>
+      <div class="checkbox-item">
+        <p-checkbox inputId="filter-printemps-r" [binary]="true" (onChange)="dt.filter($event.checked ? true : null, 'printemps', 'equals')"></p-checkbox>
+        <label for="filter-printemps-r">Printemps</label>
+      </div>
+      <div class="checkbox-item">
+        <p-checkbox inputId="filter-ete-r" [binary]="true" (onChange)="dt.filter($event.checked ? true : null, 'ete', 'equals')"></p-checkbox>
+        <label for="filter-ete-r">Été</label>
+      </div>
+      <div class="checkbox-item">
+        <p-checkbox inputId="filter-automne-r" [binary]="true" (onChange)="dt.filter($event.checked ? true : null, 'automne', 'equals')"></p-checkbox>
+        <label for="filter-automne-r">Automne</label>
+      </div>
+      <div class="checkbox-item">
+        <p-checkbox inputId="filter-hiver-r" [binary]="true" (onChange)="dt.filter($event.checked ? true : null, 'hiver', 'equals')"></p-checkbox>
+        <label for="filter-hiver-r">Hiver</label>
+      </div>
+    </div>
+  </div>
 
-            <input class="bottom" id="input" type="text" size="30" pInputText [(ngModel)]="recette.titre" placeholder="Titre">
-            <ng-container *ngFor="let ingredient of recette.ingredients; index as idx">
-                <div class="ui-g bottom">
-                    <p-dropdown class="right" [filter]="true" [options]="produits" [(ngModel)]="ingredient.produit" placeholder="Produit"></p-dropdown>
-                    <input id="input" type="text" size="1" pInputText [(ngModel)]="ingredient.quantite" placeholder="Qtt">
-                    <input *ngIf="!!ingredient.produit" id="input" class="no-border" type="text" size="6" pInputText [(ngModel)]="ingredient.produit.unite" [disabled]="true">
-                    <p-button class="left" icon="pi pi-trash" (click)="enleverIngredient(idx)"></p-button>
-                </div>
-            </ng-container>
-            <p-button class="ui-g size" icon="pi pi-check" label="Ajouter un ingredient" (click)="ajouterIngredient()"></p-button>
-            <p-button style="margin-top: 1em;" class="ui-g size" icon="pi pi-search" label="Déduire la saison" (click)="deduireSaison()"></p-button>
-            <div class="flex-column" style="margin-top: 1em;">
-                <div><p-checkbox [(ngModel)]="ete" label="Eté" binary="true"></p-checkbox></div>
-                <div><p-checkbox [(ngModel)]="printemps" label="Printemps" binary="true"></p-checkbox></div>
-                <div><p-checkbox [(ngModel)]="automne" label="Automne" binary="true"></p-checkbox></div>
-                <div><p-checkbox [(ngModel)]="hiver" label="Hiver" binary="true"></p-checkbox></div>
+  <!-- Desktop Table View -->
+  <div class="desktop-only">
+    <p-table #dt [value]="recettes" dataKey="id" [rowHover]="true"
+             [rows]="10" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]"
+             [paginator]="true" currentPageReportTemplate="{first} à {last} sur {totalRecords}"
+             [filterDelay]="0" [globalFilterFields]="['titre', 'stringIngredients']"
+             styleClass="modern-table">
+      <ng-template pTemplate="header">
+        <tr>
+          <th pSortableColumn="titre">Titre <p-sortIcon field="titre"></p-sortIcon></th>
+          <th>Ingrédients</th>
+          <th>Saisons</th>
+          <th style="width: 100px; text-align: center;">Actions</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-recipe>
+        <tr>
+          <td>
+            <div class="recipe-title-wrapper">
+              <span class="font-bold">{{ recipe.titre }}</span>
+              <a *ngIf="recipe.url" [href]="recipe.url" target="_blank" class="google-link" pTooltip="Recherche Google">
+                <i class="pi pi-google"></i>
+              </a>
             </div>
-            <p class="ui-g" style="flex-direction: row-reverse;">Ingrédient(s) : {{ getNbIngredients() }}</p>
-            <div class="flex-end">
-                <p-button icon="pi pi-undo" (click)="initRecette()"></p-button>
-                <p-button icon="pi pi-check" label="Créer/Modifier la recette" (click)="creerRecette()"></p-button>
-            </div>
+          </td>
+          <td>
+            <span class="ingredients-summary" [pTooltip]="recipe.tooltipIngredients">{{ recipe.stringIngredients }}</span>
+          </td>
+          <td>
+            <span *ngIf="recipe.printemps" class="badge badge-spring">Printemps</span>
+            <span *ngIf="recipe.ete" class="badge badge-summer">Été</span>
+            <span *ngIf="recipe.automne" class="badge badge-autumn">Automne</span>
+            <span *ngIf="recipe.hiver" class="badge badge-winter">Hiver</span>
+          </td>
+          <td style="text-align: center;">
+            <button pButton type="button" icon="pi pi-pencil" [text]="true" [rounded]="true" (click)="recipeSelected(recipe.id)"></button>
+            <button pButton type="button" icon="pi pi-trash" severity="danger" [text]="true" [rounded]="true" (click)="deleteRecette(recipe.id)"></button>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="4" class="empty-message">Aucune recette trouvée</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <!-- Mobile Cards View -->
+  <div class="mobile-only mobile-cards-list">
+    <div *ngFor="let recipe of (dt.filteredValue || recettes)" class="app-card recipe-card">
+      <div class="flex-between">
+        <h3 class="recipe-title">{{ recipe.titre }}</h3>
+        <div class="recipe-actions">
+          <a *ngIf="recipe.url" [href]="recipe.url" target="_blank" class="icon-btn" pTooltip="Recherche Google">
+            <i class="pi pi-google"></i>
+          </a>
+          <button pButton type="button" icon="pi pi-pencil" [text]="true" [rounded]="true" (click)="recipeSelected(recipe.id)"></button>
+          <button pButton type="button" icon="pi pi-trash" severity="danger" [text]="true" [rounded]="true" (click)="deleteRecette(recipe.id)"></button>
         </div>
-        <i *ngIf="!edit" class="pi pi-plus" style="font-size: 20em; margin: auto;" (click)="initRecette();edit = !edit"></i>
+      </div>
+      <div class="recipe-details">
+        <div class="detail-row">
+          <span class="detail-label">Ingrédients :</span>
+          <span class="ingredients-text">{{ recipe.stringIngredients }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Saisons :</span>
+          <div class="badges-wrapper">
+            <span *ngIf="recipe.printemps" class="badge badge-spring">Printemps</span>
+            <span *ngIf="recipe.ete" class="badge badge-summer">Été</span>
+            <span *ngIf="recipe.automne" class="badge badge-autumn">Automne</span>
+            <span *ngIf="recipe.hiver" class="badge badge-winter">Hiver</span>
+          </div>
+        </div>
+      </div>
     </div>
+    <div *ngIf="(dt.filteredValue || recettes).length === 0" class="app-card" style="text-align: center; color: var(--text-muted); padding: 2rem;">
+      <p>Aucune recette ne correspond aux filtres.</p>
+    </div>
+  </div>
+
+  <!-- FAB for Mobile -->
+  <button class="fab-button" (click)="initRecette(); edit = true">
+    <i class="pi pi-plus"></i>
+  </button>
+
+  <!-- Edit / Create Dialog -->
+  <p-dialog [(visible)]="edit" [header]="editTitle" [modal]="true" [style]="{width: '95vw', maxWidth: '650px'}" [draggable]="false" [resizable]="false">
+    <div class="dialog-content flex-column gap-md">
+      <div>
+        <label class="form-label">Titre de la recette</label>
+        <input type="text" pInputText [(ngModel)]="recette.titre" placeholder="ex: Dahl de lentilles" style="width: 100%;">
+      </div>
+
+      <div>
+        <div class="flex-between" style="margin-bottom: 0.5rem;">
+          <label class="form-label">Ingrédients</label>
+          <p-button icon="pi pi-plus" label="Ajouter" size="small" [outlined]="true" (click)="ajouterIngredient()"></p-button>
+        </div>
+        <div class="ingredients-form-list flex-column gap-sm">
+          <div *ngFor="let ingredient of recette.ingredients; index as idx" class="ingredient-form-row">
+            <p-dropdown [filter]="true" [options]="produits" [(ngModel)]="ingredient.produit" placeholder="Sélectionner un produit" [style]="{flex: '1'}"></p-dropdown>
+            <input type="number" pInputText [(ngModel)]="ingredient.quantite" placeholder="Qtt" style="width: 70px;">
+            <span class="unit-badge" *ngIf="ingredient.produit?.unite">{{ ingredient.produit.unite }}</span>
+            <button pButton type="button" icon="pi pi-trash" severity="danger" [text]="true" size="small" (click)="enleverIngredient(idx)"></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="seasons-section">
+        <div class="flex-between" style="margin-bottom: 0.5rem;">
+          <label class="form-label">Saisons</label>
+          <button pButton type="button" icon="pi pi-bolt" label="Déduire auto" [text]="true" size="small" (click)="deduireSaison()"></button>
+        </div>
+        <div class="dialog-seasons-grid">
+          <div class="checkbox-item">
+            <p-checkbox inputId="edit-printemps-r" [(ngModel)]="printemps" binary="true"></p-checkbox>
+            <label for="edit-printemps-r">Printemps</label>
+          </div>
+          <div class="checkbox-item">
+            <p-checkbox inputId="edit-ete-r" [(ngModel)]="ete" binary="true"></p-checkbox>
+            <label for="edit-ete-r">Été</label>
+          </div>
+          <div class="checkbox-item">
+            <p-checkbox inputId="edit-automne-r" [(ngModel)]="automne" binary="true"></p-checkbox>
+            <label for="edit-automne-r">Automne</label>
+          </div>
+          <div class="checkbox-item">
+            <p-checkbox inputId="edit-hiver-r" [(ngModel)]="hiver" binary="true"></p-checkbox>
+            <label for="edit-hiver-r">Hiver</label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <ng-template pTemplate="footer">
+      <div class="flex-end gap-sm" style="display: flex; justify-content: flex-end;">
+        <p-button label="Annuler" icon="pi pi-times" [text]="true" (click)="edit = false"></p-button>
+        <p-button label="Enregistrer" icon="pi pi-check" (click)="creerRecette()"></p-button>
+      </div>
+    </ng-template>
+  </p-dialog>
 </div>

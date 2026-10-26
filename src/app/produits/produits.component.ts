@@ -1,8 +1,7 @@
 import { Component, OnInit, EventEmitter, Output, HostListener, Input } from '@angular/core';
 import { ProduitService } from '../services/produit.service';
 import { Produit } from '../model/produit';
-import { SelectItem } from 'primeng/api/selectitem';
-import { MessageService } from 'primeng/api';
+import { SelectItem, MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-produits',
@@ -50,7 +49,8 @@ export class ProduitsComponent implements OnInit {
       this.edit = true;
       this.editTitle = 'Modification';
       setTimeout(() => {
-        document.getElementById('editbox').scrollIntoView();
+        const el = document.getElementById('editbox');
+        if (el) el.scrollIntoView();
       })
     }
   }

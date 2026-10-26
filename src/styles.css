@@ -1,144 +1,177 @@
-/* You can add global styles to this file, and also import other style files */
+/* Global Styles & Variables */
+@import "primeicons/primeicons.css";
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
-p-table {
-    min-width: 300px;
-    max-width: 1800px;
+:root {
+  --primary: #10b981;
+  --primary-dark: #059669;
+  --primary-light: #ecfdf5;
+  --primary-text: #065f46;
+  
+  --bg-color: #f8fafc;
+  --surface-color: #ffffff;
+  --text-color: #1e293b;
+  --text-muted: #64748b;
+  --border-color: #e2e8f0;
+  
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+
+  --sidebar-width: 260px;
+  --bottom-nav-height: 65px;
+
+  /* Force PrimeNG light CSS variables */
+  --p-content-background: #ffffff;
+  --p-surface-0: #ffffff;
+  --p-surface-50: #f8fafc;
+  --p-surface-100: #f1f5f9;
+  --p-datatable-header-cell-background: #ffffff;
+  --p-datatable-row-background: #ffffff;
+  --p-datatable-body-cell-background: #ffffff;
+  --p-select-background: #ffffff;
+  --p-dropdown-background: #ffffff;
+  --p-inputtext-background: #ffffff;
+  --p-editor-toolbar-background: #f8fafc;
+  --p-editor-content-background: #ffffff;
 }
 
-/* MEDIA */
-@media (max-width: 800px) {
-    h1 {
-        font-size: 1.5em;
-    }
-    p-tabview li > a {
-        padding: .25em .25em !important;
-    }
-
-    p-tabview li > a > span {
-        margin-right: 0 !important;
-    }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
-
-@media (max-width: 400px) {
-    .left {
-        margin-left: 0;
-    }
-    p-button[icon="pi pi-trash"] button {
-        width: 1em !important;
-    }
-}
-@media (min-width: 400px) {
-    .left {
-        margin-left: .5em;
-    }
-    p-button[icon="pi pi-trash"] button {
-        width: 2em !important;
-    }
-}
-
-.right {
-    margin-right: .5em !important;
-}
-
-/* FLEX */
-.flex {
-    display: flex;
-}
-
-.flex1 {
-    flex: 1;
-}
-
-.flex2 {
-    flex: 2;
-}
-
-.flex3 {
-    flex: 3;
-}
-
-.flex4 {
-    flex: 4;
-}
-
-.flex6 {
-    flex: 6;
-}
-
-.flex-wrap {
-    display: flex;
-    flex-wrap: wrap;
-}
-
-.flex-column
-{
-    display: flex;
-    flex-direction: column;
-}
-
-.flex-around
-{
-    display: flex;
-    justify-content: space-around;
-}
-
-.flex-between
-{
-    display: flex;
-    justify-content: space-between;
-}
-
-.flex-end
-{
-    align-self: flex-end;
-}
-
-.no-border {
-    border: none !important;
-}
-
-.gap {
-  gap: 2em;
-}
-
-/* PRIMENG */
 
 body {
-    background-color: lightblue;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  -webkit-font-smoothing: antialiased;
 }
 
-body .ui-tabview .ui-tabview-panels {
-    background-color: floralwhite !important;
+/* Base Card Style */
+.app-card {
+  background: var(--surface-color);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s ease;
 }
 
-body .ui-table .ui-table-tbody > tr {
-    background-color: #e1eef3 !important;
-}
-body .ui-table .ui-table-tbody > tr:nth-child(even) {
-    background-color: #b8dcf9 !important;
+.app-card:hover {
+  box-shadow: var(--shadow-md);
 }
 
-body .ui-button.ui-state-default.ui-button-secondary, body .ui-buttonset.ui-button-secondary > .ui-button.ui-state-default {
-    color: #ffffff !important;
-    background-color: #48b3e0 !important;
-    border: 1px solid #48b3e0 !important;
+/* Utilities */
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-body .ui-button {
-    background-color: #48b3e0 !important;
-    border: 1px solid #48b3e0 !important;
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-body .ui-tabview.ui-tabview-top .ui-tabview-nav li.ui-state-active, body .ui-tabview.ui-tabview-bottom .ui-tabview-nav li.ui-state-active, body .ui-tabview.ui-tabview-left .ui-tabview-nav li.ui-state-active, body .ui-tabview.ui-tabview-right .ui-tabview-nav li.ui-state-active {
-    background-color: #48b3e0 !important;
-    border: 1px solid #48b3e0 !important;
+.flex-column {
+  display: flex;
+  flex-direction: column;
 }
 
-body .ui-paginator .ui-paginator-pages .ui-paginator-page.ui-state-active {
-    background-color: #48b3e0 !important;
-    color: #ffffff;
+.gap-sm { gap: 0.5rem; }
+.gap-md { gap: 1rem; }
+.gap-lg { gap: 1.5rem; }
+
+/* Checkbox with Label */
+.checkbox-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
 }
 
-.ui-dropdown-panel .ui-dropdown-items-wrapper {
-    max-height: 400px !important;
+.checkbox-item label {
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.9rem;
+  color: var(--text-color);
+}
+
+/* FAB (Floating Action Button) */
+.fab-button {
+  position: fixed;
+  bottom: calc(var(--bottom-nav-height) + 1.5rem);
+  right: 1.5rem;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-full);
+  background-color: var(--primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  box-shadow: var(--shadow-lg);
+  border: none;
+  cursor: pointer;
+  z-index: 100;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.fab-button:hover {
+  background-color: var(--primary-dark);
+  transform: scale(1.05);
+}
+
+@media (min-width: 769px) {
+  .fab-button {
+    display: none;
+  }
+}
+
+/* Media Queries for Visibility */
+.mobile-only {
+  display: none !important;
+}
+
+.desktop-only {
+  display: flex !important;
+}
+
+@media (max-width: 768px) {
+  .mobile-only {
+    display: flex !important;
+  }
+  .desktop-only {
+    display: none !important;
+  }
+}
+
+/* Quill Editor Styling */
+.ql-toolbar.ql-snow {
+  background-color: #f8fafc !important;
+  border-color: var(--border-color) !important;
+  border-top-left-radius: var(--radius-md) !important;
+  border-top-right-radius: var(--radius-md) !important;
+}
+
+.ql-container.ql-snow {
+  background-color: #ffffff !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-color) !important;
+  border-bottom-left-radius: var(--radius-md) !important;
+  border-bottom-right-radius: var(--radius-md) !important;
+}
+
+.ql-editor {
+  background-color: #ffffff !important;
+  color: var(--text-color) !important;
 }

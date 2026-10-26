@@ -1,43 +1,117 @@
-.size {
-    width: 14em;
+.page-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
-.bottom {
-    margin-bottom: 1em;
+.page-header {
+  margin-bottom: 0.5rem;
 }
 
-.top {
-    margin-top: 1em;
+.page-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-color);
 }
 
-.bordure {
-    border-right: 2px solid #c8c8c8;
-    margin-right: 1em;
-    padding-right: 1em;
-    min-height: 85em;
+.page-subtitle {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  margin-top: 0.25rem;
 }
 
-.floatleft {
-    float: left;
+.header-icon {
+  height: 50px;
+  width: auto;
 }
 
-.margin {
-    margin: 1em;
+/* 4-section Grid */
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
 }
 
-textarea {
-    font-family: "Open Sans", "Helvetica Neue", sans-serif;
-    font-size: 14px;
-    min-width: 88em;
-    min-height: 77em;
+.section-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 260px;
 }
 
-.bord-top {
-    border-top: #c8c8c8 2px solid;
+.section-header {
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
 }
 
-.stock {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+.section-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-color);
+}
+
+.section-icon {
+  color: var(--primary);
+  font-size: 1.1rem;
+}
+
+.count-badge {
+  background-color: var(--primary-light);
+  color: var(--primary-dark);
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-full);
+}
+
+.items-list {
+  flex: 1;
+  margin-bottom: 1rem;
+}
+
+.item-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.unit-badge {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  min-width: 35px;
+}
+
+.section-actions {
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-color);
+}
+
+/* Proposed Recipes */
+.proposed-card {
+  border-left: 4px solid var(--primary);
+}
+
+/* Sticky Footer */
+.menu-footer-bar {
+  position: sticky;
+  bottom: calc(var(--bottom-nav-height) + 1rem);
+  z-index: 20;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border-color);
+  padding: 1rem 1.5rem;
+}
+
+.footer-summary {
+  font-size: 1rem;
+  color: var(--text-color);
+}
+
+@media (min-width: 769px) {
+  .menu-footer-bar {
+    bottom: 2rem;
+  }
 }

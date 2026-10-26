@@ -1,25 +1,20 @@
-<div class="flex-column">
-    <div class="flex-between">
-        <h1>Liste de courses</h1>
-        <img style="width: 100px;" src="/assets/basket.png">
+<div class="page-container">
+  <div class="page-header flex-between">
+    <div>
+      <h1 class="page-title">Liste de courses</h1>
+      <p class="page-subtitle">Visualisez et exportez votre liste d'ingrédients à acheter</p>
     </div>
-  <div class="flex-between">
-    <div class="grow">
-        <p-editor #editor [(ngModel)]="text"></p-editor>
-    </div>
-    <!--<div class="grow bigleft" *ngIf="recettes">
-      <h2>Recettes sélectionnées</h2>
-      <ul #rec>
-        <li *ngFor="let recette of recettes">{{ recette.titre }}
-          (<ng-container *ngFor="let ingredient of recette.ingredients; let first = first;"><ng-container *ngIf="ingredient.produit.type == 'légume'"><ng-container *ngIf="!first">, </ng-container>{{ ingredient.quantite }} <ng-container *ngIf="ingredient.produit.unite != 'pièce(s)'">{{ ingredient.produit.unite }}</ng-container> {{ ingredient.produit.label }}</ng-container></ng-container>)
-        </li>
-      </ul>
-    </div>-->
+    <img class="header-icon desktop-only" src="/assets/basket.png" alt="Panier"/>
   </div>
-    <div class="flex-between">
-        <a href="https://www.leclercdrive.fr/" target="_blank">
-          <img style="mix-blend-mode: multiply" src="https://mgt.leclercdrive.fr/communiques/visuelpagescontenu.ashx?id=340&type=2&mindim=60" />
-        </a>
-        <p-button class="right top" icon="pi pi-copy" [clipboard]="editor" (copied)="notify($event)"></p-button>
-    </div>
+
+  <div class="app-card editor-card">
+    <p-editor #editor [(ngModel)]="text" [style]="{'height':'400px'}"></p-editor>
+  </div>
+
+  <div class="app-card actions-card flex-between">
+    <a href="https://www.leclercdrive.fr/" target="_blank" class="drive-link">
+      <img src="https://mgt.leclercdrive.fr/communiques/visuelpagescontenu.ashx?id=340&type=2&mindim=60" alt="Leclerc Drive" class="drive-logo"/>
+    </a>
+    <p-button icon="pi pi-copy" label="Copier la liste" class="p-button-lg" [clipboard]="editor" (copied)="notify($event)"></p-button>
+  </div>
 </div>

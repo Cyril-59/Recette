@@ -4,22 +4,73 @@
         <p-progressSpinner></p-progressSpinner>
     </div>
 </div>
-<div class="flex-between">
-    <span></span>
-    <h1 class="" style="font-family: 'Open Sans'">Qu'est-ce qu'on mange ?</h1>
-    <img style="height: 100px;" src="/assets/logo.png"/>
+
+<div class="app-layout">
+  <!-- Desktop Sidebar -->
+  <aside class="app-sidebar desktop-only">
+    <div class="sidebar-header">
+      <img class="app-logo" src="/assets/logo.png" alt="Logo"/>
+      <h2 class="app-title">Qu'est-ce qu'on mange ?</h2>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="nav-item" [class.active]="index === 0" (click)="index = 0">
+        <i class="pi pi-home"></i>
+        <span>Menu de la semaine</span>
+      </button>
+      <button class="nav-item" [class.active]="index === 1" (click)="index = 1">
+        <i class="pi pi-shopping-cart"></i>
+        <span>Liste de courses</span>
+      </button>
+      <button class="nav-item" [class.active]="index === 2" (click)="index = 2">
+        <i class="pi pi-book"></i>
+        <span>Recettes</span>
+      </button>
+      <button class="nav-item" [class.active]="index === 3" (click)="index = 3">
+        <i class="pi pi-apple"></i>
+        <span>Produits</span>
+      </button>
+    </nav>
+  </aside>
+
+  <!-- Mobile Top Bar -->
+  <header class="app-topbar mobile-only">
+    <img class="app-logo-small" src="/assets/logo.png" alt="Logo"/>
+    <h2 class="app-title-small">Qu'est-ce qu'on mange ?</h2>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="app-content">
+    <div [style.display]="index === 0 ? 'block' : 'none'">
+      <app-stocks [innerWidth]="innerWidth" [produits]="produits" [recettes]="recettes" [recettesCourses]="recettesCourses" (onCourses)="setText($event)"></app-stocks>
+    </div>
+    <div [style.display]="index === 1 ? 'block' : 'none'">
+      <app-courses [text]="text" [recettes]="recettesCourses"></app-courses>
+    </div>
+    <div [style.display]="index === 2 ? 'block' : 'none'">
+      <app-recettes [innerWidth]="innerWidth" [produits]="produits" (onRecettes)="setRecettes($event)"></app-recettes>
+    </div>
+    <div [style.display]="index === 3 ? 'block' : 'none'">
+      <app-produits [innerWidth]="innerWidth" (onProduits)="setProduits($event)"></app-produits>
+    </div>
+  </main>
+
+  <!-- Mobile Bottom Nav -->
+  <nav class="app-bottom-nav mobile-only">
+    <button class="bottom-nav-item" [class.active]="index === 0" (click)="index = 0">
+      <i class="pi pi-home"></i>
+      <span>Menu</span>
+    </button>
+    <button class="bottom-nav-item" [class.active]="index === 1" (click)="index = 1">
+      <i class="pi pi-shopping-cart"></i>
+      <span>Courses</span>
+    </button>
+    <button class="bottom-nav-item" [class.active]="index === 2" (click)="index = 2">
+      <i class="pi pi-book"></i>
+      <span>Recettes</span>
+    </button>
+    <button class="bottom-nav-item" [class.active]="index === 3" (click)="index = 3">
+      <i class="pi pi-apple"></i>
+      <span>Produits</span>
+    </button>
+  </nav>
 </div>
-<p-tabView [(activeIndex)]="index">
-    <p-tabPanel header="Menu" leftIcon="pi pi-home">
-        <app-stocks [innerWidth]="innerWidth" [produits]="produits" [recettes]="recettes" [recettesCourses]="recettesCourses" (onCourses)="setText($event)"></app-stocks>
-    </p-tabPanel>
-    <p-tabPanel header="Courses" leftIcon="pi pi-shopping-cart">
-        <app-courses [text]="text" [recettes]="recettesCourses" ></app-courses>
-    </p-tabPanel>
-    <p-tabPanel header="Produits" leftIcon="pi pi-apple">
-        <app-produits [innerWidth]="innerWidth" (onProduits)="setProduits($event)"></app-produits>
-    </p-tabPanel>
-    <p-tabPanel header="Recettes" leftIcon="pi pi-list">
-        <app-recettes [innerWidth]="innerWidth" [produits]="produits" (onRecettes)="setRecettes($event)"></app-recettes>
-    </p-tabPanel>
-</p-tabView>

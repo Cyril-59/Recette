@@ -2,9 +2,8 @@ import { Component, OnInit, Input, OnChanges, SimpleChanges, Output, EventEmitte
 import { Recette } from '../model/recette';
 import { RecetteService } from '../services/recette.service';
 import { Produit } from '../model/produit';
-import { SelectItem } from 'primeng/api/selectitem';
 import { Ingredient } from '../model/ingredient';
-import { MessageService } from 'primeng/api';
+import { SelectItem, MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-recettes',
@@ -114,7 +113,8 @@ export class RecettesComponent implements OnInit {
     this.edit = true;
     this.editTitle = 'Modification';
     setTimeout(() => {
-      document.getElementById('editbox').scrollIntoView();
+      const el = document.getElementById('editbox');
+      if (el) el.scrollIntoView();
     })
   }
 

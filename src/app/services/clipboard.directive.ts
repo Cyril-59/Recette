@@ -1,6 +1,6 @@
 import { Directive, Input, Output, EventEmitter, HostListener } from "@angular/core";
 import { Ingredient } from '../model/ingredient';
-import { Editor } from 'primeng/editor/editor';
+import { Editor } from 'primeng/editor';
 
 @Directive({ selector: '[clipboard]' })
 export class ClipboardDirective {

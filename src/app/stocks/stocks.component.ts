@@ -1,8 +1,7 @@
 import { Component, OnInit, Input, OnChanges, SimpleChanges, EventEmitter, Output } from '@angular/core';
 import { Recette } from '../model/recette';
 import { Ingredient } from '../model/ingredient';
-import { SelectItem } from 'primeng/api/selectitem';
-import { MessageService } from 'primeng/api';
+import { SelectItem, MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-stocks',
@@ -296,6 +295,14 @@ export class StocksComponent implements OnInit, OnChanges {
 
   goToUrl(url) {
     window.open(url, "_blank");
+  }
+
+  getNbRecettesSaison() {
+    return this.recettesSaison ? this.recettesSaison.filter(r => !!r.titre).length : 0;
+  }
+
+  getNbAutresRecettes() {
+    return this.autresRecettes ? this.autresRecettes.filter(r => !!r.titre).length : 0;
   }
 
   getNbRecettes() {

@@ -1,7 +1,7 @@
 import { Component, OnInit, OnChanges, SimpleChanges, HostListener, AfterViewInit } from '@angular/core';
 import { ProduitService } from '../services/produit.service';
 import { Produit } from '../model/produit';
-import { SelectItem } from 'primeng/api/selectitem';
+import { SelectItem } from 'primeng/api';
 import { Recette } from '../model/recette';
 
 @Component({

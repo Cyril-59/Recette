@@ -1,49 +1,55 @@
-.right {
-    margin-right: 1em;
+.page-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
-.left {
-    margin-left: 1em;
+.page-header {
+  margin-bottom: 0.5rem;
 }
 
-.bigleft {
-    margin-left: 4em;
+.page-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-color);
 }
 
-.size {
-    width: 14em;
+.page-subtitle {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  margin-top: 0.25rem;
 }
 
-.bottom {
-    margin-bottom: 1em;
+.header-icon {
+  height: 50px;
+  width: auto;
 }
 
-.top {
-    margin-top: 1em;
+.editor-card {
+  padding: 1rem;
 }
 
-.bordure {
-    border-right: 2px solid #c8c8c8;
-    margin-right: 1em;
-    padding-right: 1em;
-    min-height: 85em;
+:host ::ng-deep .ql-toolbar {
+  border-top-left-radius: var(--radius-md) !important;
+  border-top-right-radius: var(--radius-md) !important;
+  border-color: var(--border-color) !important;
+  background-color: var(--bg-color);
 }
 
-.floatleft {
-    float: left;
+:host ::ng-deep .ql-container {
+  border-bottom-left-radius: var(--radius-md) !important;
+  border-bottom-right-radius: var(--radius-md) !important;
+  border-color: var(--border-color) !important;
+  font-family: inherit;
+  font-size: 1rem;
 }
 
-.margin {
-    margin: 1em;
+.actions-card {
+  padding: 1.25rem 1.5rem;
 }
 
-textarea {
-    font-family: "Open Sans", "Helvetica Neue", sans-serif;
-    font-size: 14px;
-    min-width: 88em;
-    min-height: 77em;
-}
-
-.grow {
-  flex-grow: 1;
+.drive-logo {
+  height: 40px;
+  mix-blend-mode: multiply;
+  object-fit: contain;
 }

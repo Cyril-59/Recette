@@ -1,98 +1,161 @@
-<div>
-    <div class="flex-between">
-        <h1>Liste des produits</h1>
-        <div id="vegetables"></div>
+<div class="page-container">
+  <div class="page-header flex-between">
+    <div>
+      <h1 class="page-title">Produits</h1>
+      <p class="page-subtitle">Gérez vos ingrédients et produits disponibles</p>
     </div>
-    <div class="flex-wrap gap">
-        <p-table class="flex3" #dt [value]="produits" dataKey="id" styleClass="ui-table-customers" [rowHover]="true"
-            [rows]="10" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]"
-            [paginator]="true" currentPageReportTemplate="{first} à {last} sur {totalRecords}"
-            [filterDelay]="0" [globalFilterFields]="['label', 'unite']">
-            <ng-template pTemplate="header">
-                <tr>
-                    <th pSortableColumn="label">Label <p-sortIcon field="label"></p-sortIcon></th>
-                    <ng-container *ngIf="innerWidth > 600">
-                        <th>Saisons</th>
-                        <th>Unité</th>
-                        <th>Type</th>
-                    </ng-container>
-                    <th style="width: 8em;">Actions</th>
-                </tr>
-                <tr>
-                    <th>
-                        <input pInputText type="text" (input)="dt.filter($event.target.value, 'label', 'startsWith')" placeholder="Label" class="ui-column-filter">
-                    </th>
-                    <ng-container *ngIf="innerWidth > 600">
-                        <th class="flex-wrap">
-                            <p-checkbox label="Pri." binary="true" (onChange)="$event ? dt.filter($event, 'printemps', 'equals') : dt.reset()"></p-checkbox>
-                            <p-checkbox label="Eté." binary="true" (onChange)="$event ? dt.filter($event, 'ete', 'equals') : dt.reset()"></p-checkbox>
-                            <p-checkbox label="Aut." binary="true" (onChange)="$event ? dt.filter($event, 'automne', 'equals') : dt.reset()"></p-checkbox>
-                            <p-checkbox label="Hiv." binary="true" (onChange)="$event ? dt.filter($event, 'hiver', 'equals') : dt.reset()"></p-checkbox>
-                        </th>
-                        <th>
-                            <input pInputText type="text" (input)="dt.filter($event.target.value, 'unite', 'startsWith')" placeholder="Unité" class="ui-column-filter">
-                        </th>
-                        <th>
-                            <input pInputText type="text" (input)="dt.filter($event.target.value, 'type', 'startsWith')" placeholder="Type" class="ui-column-filter">
-                        </th>
-                    </ng-container>
-                    <th></th>
-                </tr>
-            </ng-template>
-            <ng-template pTemplate="body" let-product>
-                <tr class="ui-selectable-row">
-                    <td>
-                        {{product.label}}
-                    </td>
-                    <ng-container *ngIf="innerWidth > 600">
-                        <td>
-                            {{product.printemps ? 'printemps' : ''}}
-                            {{product.ete ? 'été' : ' '}}
-                            {{product.automne ? 'automne' : ' '}}
-                            {{product.hiver ? 'hiver' : ''}}
-                        </td>
-                        <td>
-                            {{product.unite}}
-                        </td>
-                        <td>
-                            {{product.type}}
-                        </td>
-                    </ng-container>
-                    <td>
-                        <button pButton type="button" class="ui-button-secondary right" icon="pi pi-pencil" (click)="produitSelected(product.id)"></button>
-                        <button pButton type="button" class="ui-button-secondary" icon="pi pi-trash" (click)="deleteProduit(product.id)"></button>
-                    </td>
-                </tr>
-            </ng-template>
-            <ng-template pTemplate="emptymessage">
-                <tr>
-                    <td colspan="8" style="text-align:left">Aucun produit</td>
-                </tr>
-            </ng-template>
-        </p-table>
+    <p-button class="desktop-only" icon="pi pi-plus" label="Ajouter un produit" (click)="cleanProduit(); edit = true"></p-button>
+  </div>
 
-        <div *ngIf="edit" class="flex-column flex-start flex1" style="min-width: 310px" id="editbox">
-            <div class="flex-between">
-                <h2>{{ editTitle }}</h2>
-                <i class="pi pi-times" style="font-size: 2em;" (click)="edit = !edit"></i>
-            </div>
-            <div class="flex-column">
-                <p-dropdown [filter]="true" [options]="options" [(ngModel)]="produitId" editable="true" placeholder="Produit" (onChange)="produitSelected($event.value)"></p-dropdown>
-                <p-dropdown [filter]="true" [options]="unites" [(ngModel)]="unite" editable="true" placeholder="Unité"></p-dropdown>
-                <p-dropdown [filter]="true" [options]="types" [(ngModel)]="type" editable="true" placeholder="Type"></p-dropdown>
-            </div>
-            <h3>Saison</h3>
-            <div>
-                <div><p-checkbox [(ngModel)]="ete" label="Eté" binary="true"></p-checkbox></div>
-                <div><p-checkbox [(ngModel)]="printemps" label="Printemps" binary="true"></p-checkbox></div>
-                <div><p-checkbox [(ngModel)]="automne" label="Automne" binary="true"></p-checkbox></div>
-                <div><p-checkbox [(ngModel)]="hiver" label="Hiver" binary="true"></p-checkbox></div>
-            </div>
-            <div class="flex-end">
-                <p-button icon="pi pi-undo" (click)="cleanProduit()"></p-button>
-                <p-button icon="pi pi-check" label="Créer/Modifier le produit" (click)="creerProduit()"></p-button>
-            </div>
-        </div>
-        <i *ngIf="!edit" class="pi pi-plus" style="font-size: 20em;margin: auto;" (click)="cleanProduit();edit = !edit"></i>
+  <!-- Search & Filters Card -->
+  <div class="app-card filters-card">
+    <div class="search-input-wrapper">
+      <i class="pi pi-search search-icon"></i>
+      <input pInputText type="text" (input)="dt.filterGlobal($event.target.value, 'contains')" placeholder="Rechercher un produit..." class="search-input">
     </div>
+    <div class="season-filters">
+      <span class="filter-label">Saisons :</span>
+      <div class="checkbox-item">
+        <p-checkbox inputId="filter-printemps-p" [binary]="true" (onChange)="dt.filter($event.checked ? true : null, 'printemps', 'equals')"></p-checkbox>
+        <label for="filter-printemps-p">Printemps</label>
+      </div>
+      <div class="checkbox-item">
+        <p-checkbox inputId="filter-ete-p" [binary]="true" (onChange)="dt.filter($event.checked ? true : null, 'ete', 'equals')"></p-checkbox>
+        <label for="filter-ete-p">Été</label>
+      </div>
+      <div class="checkbox-item">
+        <p-checkbox inputId="filter-automne-p" [binary]="true" (onChange)="dt.filter($event.checked ? true : null, 'automne', 'equals')"></p-checkbox>
+        <label for="filter-automne-p">Automne</label>
+      </div>
+      <div class="checkbox-item">
+        <p-checkbox inputId="filter-hiver-p" [binary]="true" (onChange)="dt.filter($event.checked ? true : null, 'hiver', 'equals')"></p-checkbox>
+        <label for="filter-hiver-p">Hiver</label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Desktop Table View -->
+  <div class="desktop-only">
+    <p-table #dt [value]="produits" dataKey="id" [rowHover]="true"
+             [rows]="10" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]"
+             [paginator]="true" currentPageReportTemplate="{first} à {last} sur {totalRecords}"
+             [filterDelay]="0" [globalFilterFields]="['label', 'unite', 'type']"
+             styleClass="modern-table">
+      <ng-template pTemplate="header">
+        <tr>
+          <th pSortableColumn="label">Label <p-sortIcon field="label"></p-sortIcon></th>
+          <th>Saisons</th>
+          <th pSortableColumn="unite">Unité <p-sortIcon field="unite"></p-sortIcon></th>
+          <th pSortableColumn="type">Type <p-sortIcon field="type"></p-sortIcon></th>
+          <th style="width: 100px; text-align: center;">Actions</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-product>
+        <tr>
+          <td class="font-bold">{{ product.label }}</td>
+          <td>
+            <span *ngIf="product.printemps" class="badge badge-spring">Printemps</span>
+            <span *ngIf="product.ete" class="badge badge-summer">Été</span>
+            <span *ngIf="product.automne" class="badge badge-autumn">Automne</span>
+            <span *ngIf="product.hiver" class="badge badge-winter">Hiver</span>
+          </td>
+          <td>{{ product.unite }}</td>
+          <td><span class="type-tag">{{ product.type }}</span></td>
+          <td style="text-align: center;">
+            <button pButton type="button" icon="pi pi-pencil" [text]="true" [rounded]="true" (click)="produitSelected(product.id)"></button>
+            <button pButton type="button" icon="pi pi-trash" severity="danger" [text]="true" [rounded]="true" (click)="deleteProduit(product.id)"></button>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="5" class="empty-message">Aucun produit trouvé</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <!-- Mobile Cards View -->
+  <div class="mobile-only mobile-cards-list">
+    <div *ngFor="let product of (dt.filteredValue || produits)" class="app-card product-card">
+      <div class="flex-between">
+        <div>
+          <h3 class="product-title">{{ product.label }}</h3>
+          <span class="type-tag">{{ product.type }}</span>
+        </div>
+        <div class="product-actions">
+          <button pButton type="button" icon="pi pi-pencil" [text]="true" [rounded]="true" (click)="produitSelected(product.id)"></button>
+          <button pButton type="button" icon="pi pi-trash" severity="danger" [text]="true" [rounded]="true" (click)="deleteProduit(product.id)"></button>
+        </div>
+      </div>
+      <div class="product-details">
+        <div class="detail-row">
+          <span class="detail-label">Unité :</span>
+          <span>{{ product.unite }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Saisons :</span>
+          <div class="badges-wrapper">
+            <span *ngIf="product.printemps" class="badge badge-spring">Printemps</span>
+            <span *ngIf="product.ete" class="badge badge-summer">Été</span>
+            <span *ngIf="product.automne" class="badge badge-autumn">Automne</span>
+            <span *ngIf="product.hiver" class="badge badge-winter">Hiver</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="(dt.filteredValue || produits).length === 0" class="app-card" style="text-align: center; color: var(--text-muted); padding: 2rem;">
+      <p>Aucun produit ne correspond aux filtres.</p>
+    </div>
+  </div>
+
+  <!-- FAB for Mobile -->
+  <button class="fab-button" (click)="cleanProduit(); edit = true">
+    <i class="pi pi-plus"></i>
+  </button>
+
+  <!-- Edit / Create Dialog -->
+  <p-dialog [(visible)]="edit" [header]="editTitle" [modal]="true" [style]="{width: '90vw', maxWidth: '500px'}" [draggable]="false" [resizable]="false">
+    <div class="dialog-content flex-column gap-md">
+      <div>
+        <label class="form-label">Produit</label>
+        <p-dropdown [filter]="true" [options]="options" [(ngModel)]="produitId" editable="true" placeholder="Sélectionner ou saisir" (onChange)="produitSelected($event.value)" [style]="{width: '100%'}"></p-dropdown>
+      </div>
+      <div>
+        <label class="form-label">Unité</label>
+        <p-dropdown [filter]="true" [options]="unites" [(ngModel)]="unite" editable="true" placeholder="Unité" [style]="{width: '100%'}"></p-dropdown>
+      </div>
+      <div>
+        <label class="form-label">Type</label>
+        <p-dropdown [filter]="true" [options]="types" [(ngModel)]="type" editable="true" placeholder="Type" [style]="{width: '100%'}"></p-dropdown>
+      </div>
+      <div>
+        <label class="form-label">Saisons</label>
+        <div class="dialog-seasons-grid">
+          <div class="checkbox-item">
+            <p-checkbox inputId="edit-printemps-p" [(ngModel)]="printemps" binary="true"></p-checkbox>
+            <label for="edit-printemps-p">Printemps</label>
+          </div>
+          <div class="checkbox-item">
+            <p-checkbox inputId="edit-ete-p" [(ngModel)]="ete" binary="true"></p-checkbox>
+            <label for="edit-ete-p">Été</label>
+          </div>
+          <div class="checkbox-item">
+            <p-checkbox inputId="edit-automne-p" [(ngModel)]="automne" binary="true"></p-checkbox>
+            <label for="edit-automne-p">Automne</label>
+          </div>
+          <div class="checkbox-item">
+            <p-checkbox inputId="edit-hiver-p" [(ngModel)]="hiver" binary="true"></p-checkbox>
+            <label for="edit-hiver-p">Hiver</label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <ng-template pTemplate="footer">
+      <div class="flex-end gap-sm" style="display: flex; justify-content: flex-end;">
+        <p-button label="Annuler" icon="pi pi-times" [text]="true" (click)="edit = false"></p-button>
+        <p-button label="Enregistrer" icon="pi pi-check" (click)="creerProduit()"></p-button>
+      </div>
+    </ng-template>
+  </p-dialog>
 </div>
