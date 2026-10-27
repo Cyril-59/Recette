@@ -59,7 +59,7 @@
   color: var(--text-muted);
 }
 
-/* Badges */
+/* Badges Saisons */
 .badge {
   display: inline-block;
   padding: 0.2rem 0.5rem;
@@ -73,6 +73,102 @@
 .badge-summer { background: #fef08a; color: #854d0e; }
 .badge-autumn { background: #ffedd5; color: #9a3412; }
 .badge-winter { background: #e0f2fe; color: #075985; }
+
+/* Tags Badges & Chips */
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.35rem;
+}
+
+.tag-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.18rem 0.55rem;
+  background-color: #f1f5f9;
+  color: #334155;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid var(--border-color);
+}
+
+.tag-vege {
+  background-color: #ecfdf5;
+  color: #065f46;
+  border-color: #a7f3d0;
+}
+
+.tag-express {
+  background-color: #fffbeb;
+  color: #b45309;
+  border-color: #fde68a;
+}
+
+.tag-anti-gaspi {
+  background-color: #fef3c7;
+  color: #92400e;
+  border-color: #fde68a;
+}
+
+/* Dialog Tags Section */
+.tags-form-section {
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+}
+
+.predefined-tags-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+}
+
+.tag-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-color);
+  background: white;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tag-toggle-btn:hover {
+  background: var(--primary-light);
+  border-color: var(--primary);
+  color: var(--primary-dark);
+}
+
+.tag-toggle-btn.active {
+  background: var(--primary);
+  border-color: var(--primary-dark);
+  color: white;
+}
+
+.tag-badge-removable {
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tag-badge-removable:hover {
+  background-color: #fee2e2;
+  color: #991b1b;
+  border-color: #fca5a5;
+}
+
+.remove-tag-icon {
+  font-size: 0.65rem;
+}
 
 .recipe-title-wrapper {
   display: flex;

@@ -32,14 +32,30 @@
     </nav>
   </aside>
 
-  <!-- Mobile Top Bar -->
-  <header class="app-topbar mobile-only">
-    <img class="app-logo-small" src="/assets/logo.png" alt="Logo"/>
-    <h2 class="app-title-small">Qu'est-ce qu'on mange ?</h2>
+  <!-- Mobile Top Bar with Quick Access button -->
+  <header class="app-topbar mobile-only flex-between">
+    <div class="flex-center gap-sm">
+      <img class="app-logo-small" src="/assets/logo.png" alt="Logo"/>
+      <h2 class="app-title-small">Qu'est-ce qu'on mange ?</h2>
+    </div>
+    <button class="quick-menu-btn-mobile" (click)="openMenuPreview()" pTooltip="Recettes prévues">
+      <i class="pi pi-book"></i>
+      <span class="quick-badge-mobile" *ngIf="recettesCourses && recettesCourses.length > 0">{{ recettesCourses.length }}</span>
+    </button>
   </header>
 
   <!-- Main Content Area -->
   <main class="app-content">
+    <!-- Desktop Header Action Bar with Quick Access -->
+    <div class="app-header-actions desktop-only flex-between">
+      <div></div>
+      <button class="quick-menu-btn-desktop" (click)="openMenuPreview()">
+        <i class="pi pi-book"></i>
+        <span>Recettes prévues</span>
+        <span class="quick-badge-desktop" *ngIf="recettesCourses && recettesCourses.length > 0">{{ recettesCourses.length }}</span>
+      </button>
+    </div>
+
     <div [style.display]="index === 0 ? 'block' : 'none'">
       <app-stocks [innerWidth]="innerWidth" [produits]="produits" [recettes]="recettes" [recettesCourses]="recettesCourses" (onCourses)="setText($event)"></app-stocks>
     </div>
@@ -73,4 +89,92 @@
       <span>Produits</span>
     </button>
   </nav>
+
+  <!-- Modal des Recettes Prévues au Menu & Instructions -->
+  <p-dialog [(visible)]="showMenuPreview" 
+            [header]="selectedRecipeDetail ? selectedRecipeDetail.titre : 'Recettes prévues au menu'" 
+            [modal]="true" 
+            [style]="{width: '92vw', maxWidth: '600px'}" 
+            [draggable]="false" 
+            [resizable]="false">
+    
+    <!-- Vue 1 : Liste des recettes sélectionnées -->
+    <div *ngIf="!selectedRecipeDetail" class="menu-preview-container">
+      <div *ngIf="recettesCourses && recettesCourses.length > 0; else noRecipesTpl" class="planned-recipes-list flex-column gap-sm">
+        <p class="preview-subtitle">Cliquez sur une recette pour afficher ses étapes de préparation :</p>
+        
+        <div *ngFor="let r of recettesCourses" class="planned-recipe-item flex-between" (click)="selectRecipeDetail(r)">
+          <div class="recipe-item-left">
+            <h4 class="recipe-item-title">{{ r.titre }}</h4>
+            <div class="tags-container" *ngIf="r.tags && r.tags.length > 0" style="margin-bottom: 0.25rem;">
+              <span *ngFor="let t of r.tags" class="tag-badge" [ngClass]="{'tag-vege': t === 'Végétarien', 'tag-express': t.startsWith('Express')}">{{ t }}</span>
+            </div>
+            <span class="recipe-item-ingredients-count" *ngIf="r.ingredients && r.ingredients.length > 0">
+              {{ r.ingredients.length }} ingrédient(s)
+            </span>
+          </div>
+          <div class="recipe-item-right flex-center gap-sm">
+            <span *ngIf="r.instructions" class="has-instructions-pill">
+              <i class="pi pi-align-left"></i> Préparation
+            </span>
+            <i class="pi pi-chevron-right chevron-icon"></i>
+          </div>
+        </div>
+      </div>
+
+      <ng-template #noRecipesTpl>
+        <div class="empty-menu-box flex-column flex-center gap-md">
+          <i class="pi pi-info-circle empty-icon"></i>
+          <p class="empty-text">Aucune recette n'est actuellement prévue au menu.</p>
+          <button pButton label="Composer mon menu" icon="pi pi-home" size="small" (click)="index = 0; showMenuPreview = false"></button>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Vue 2 : Fiche détaillée de la recette avec préparation -->
+    <div *ngIf="selectedRecipeDetail" class="recipe-detail-container flex-column gap-md">
+      <button pButton type="button" icon="pi pi-arrow-left" label="Retour aux recettes prévues" [text]="true" size="small" class="back-link-btn" (click)="selectedRecipeDetail = null"></button>
+
+      <!-- Titre et lien externe -->
+      <div class="detail-header flex-between">
+        <h3 class="detail-title">{{ selectedRecipeDetail.titre }}</h3>
+        <a *ngIf="selectedRecipeDetail.url" [href]="selectedRecipeDetail.url" target="_blank" class="detail-google-link" pTooltip="Recherche Google">
+          <i class="pi pi-google"></i>
+        </a>
+      </div>
+
+      <!-- Tags -->
+      <div *ngIf="selectedRecipeDetail.tags && selectedRecipeDetail.tags.length > 0" class="tags-container" style="margin-top: -0.25rem;">
+        <span *ngFor="let t of selectedRecipeDetail.tags" class="tag-badge" [ngClass]="{'tag-vege': t === 'Végétarien', 'tag-express': t.startsWith('Express')}">{{ t }}</span>
+      </div>
+
+      <!-- Ingrédients de la recette -->
+      <div *ngIf="selectedRecipeDetail.ingredients && selectedRecipeDetail.ingredients.length > 0" class="detail-box">
+        <h4 class="detail-box-title"><i class="pi pi-shopping-bag"></i> Ingrédients requis</h4>
+        <ul class="detail-ingredients-list">
+          <li *ngFor="let ing of selectedRecipeDetail.ingredients">
+            <strong>{{ ing.quantite }} {{ ing.produit?.unite }}</strong> {{ ing.produit?.label }}
+          </li>
+        </ul>
+      </div>
+
+      <!-- Instructions de préparation -->
+      <div class="detail-box">
+        <h4 class="detail-box-title"><i class="pi pi-align-left"></i> Instructions de préparation</h4>
+        <div *ngIf="selectedRecipeDetail.instructions" class="detail-instructions-text">
+          {{ selectedRecipeDetail.instructions }}
+        </div>
+        <div *ngIf="!selectedRecipeDetail.instructions" class="no-instructions-box">
+          <p>Aucune instruction de préparation n'est encore enregistrée pour cette recette.</p>
+          <p class="text-hint">Vous pouvez en ajouter depuis l'onglet <strong>Recettes</strong>.</p>
+        </div>
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <div class="flex-end" style="display: flex; justify-content: flex-end;">
+        <p-button label="Fermer" icon="pi pi-times" [text]="true" (click)="showMenuPreview = false"></p-button>
+      </div>
+    </ng-template>
+  </p-dialog>
 </div>

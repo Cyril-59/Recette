@@ -2,12 +2,12 @@
   <div class="page-header flex-between">
     <div>
       <h1 class="page-title">Menu de la semaine</h1>
-      <p class="page-subtitle">Planifiez vos repas et complétez avec vos stocks</p>
+      <p class="page-subtitle">Planifiez vos repas, explorez par tags et complétez avec vos stocks</p>
     </div>
     <img class="header-icon desktop-only" src="/assets/fridge.png" alt="Frigo"/>
   </div>
 
-  <!-- 4 Sections in a responsive grid -->
+  <!-- Sections in a responsive grid -->
   <div class="menu-grid">
     <!-- 1. Recettes de saison -->
     <div class="app-card section-card">
@@ -45,7 +45,87 @@
       </div>
     </div>
 
-    <!-- 3. Ce que j'ai en stock -->
+    <!-- 3. Suggestions Anti-Gaspillage (placée immédiatement après Autres recettes) -->
+    <div *ngIf="getAntiGaspiSuggestions().length > 0" class="app-card section-card anti-gaspi-card">
+      <div class="section-header flex-between">
+        <div class="flex-center gap-xs">
+          <div class="anti-gaspi-icon-wrap"><i class="pi pi-bolt"></i></div>
+          <h2 class="section-title" style="color: #92400e; margin-bottom: 0;">Anti-gaspillage</h2>
+        </div>
+        <span class="count-badge anti-gaspi-badge">{{ getAntiGaspiSuggestions().length }}</span>
+      </div>
+
+      <div class="anti-gaspi-body flex-column gap-sm">
+        <p class="anti-gaspi-subtitle">Recettes liées à vos choix pour finir vos ingrédients :</p>
+        <div class="anti-gaspi-list-compact flex-column gap-xs">
+          <div *ngFor="let sug of getAntiGaspiSuggestions()" class="anti-gaspi-item-card flex-between">
+            <div class="anti-gaspi-recipe-info">
+              <div class="flex-center gap-xs" style="justify-content: flex-start;">
+                <h4 class="recipe-name-text font-bold">{{ sug.suggestedRecipe.titre }}</h4>
+                <button *ngIf="sug.suggestedRecipe.instructions" pButton type="button" icon="pi pi-align-left" [text]="true" size="small" pTooltip="Instructions" (click)="viewInstructions(sug.suggestedRecipe)" class="mini-icon-btn"></button>
+              </div>
+              <div class="anti-gaspi-reason-text">
+                <i class="pi pi-link"></i> Liée à <em>{{ sug.sourceRecipe.titre }}</em>
+              </div>
+            </div>
+            <button pButton type="button" icon="pi pi-plus" label="Ajouter" size="small" (click)="toggleRecipeInMenu(sug.suggestedRecipe)"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Recherche par tags -->
+    <div class="app-card section-card tag-search-card">
+      <div class="section-header flex-between">
+        <h2 class="section-title"><i class="pi pi-tags section-icon"></i> Recherche par tags</h2>
+        <span class="count-badge" *ngIf="selectedTag">{{ getMatchingRecipesByTag().length }}</span>
+      </div>
+
+      <div class="tag-search-body flex-column gap-sm">
+        <!-- Tag selector pills -->
+        <div class="tag-pills-wrap">
+          <button *ngFor="let t of allTags"
+                  type="button"
+                  class="tag-filter-pill"
+                  [class.active]="selectedTag === t"
+                  (click)="selectTag(t)">
+            <i class="pi pi-tag tag-pill-icon"></i>
+            {{ t }}
+          </button>
+        </div>
+
+        <!-- Matching recipes list -->
+        <div *ngIf="selectedTag; else selectTagPrompt" class="matching-recipes-list flex-column gap-xs">
+          <div *ngFor="let r of getMatchingRecipesByTag()" class="tag-recipe-row flex-between">
+            <div class="tag-recipe-title-area flex-center gap-xs">
+              <span class="font-bold recipe-name-text">{{ r.titre }}</span>
+              <button *ngIf="r.instructions" pButton type="button" icon="pi pi-align-left" [text]="true" size="small" pTooltip="Instructions" (click)="viewInstructions(r)" class="mini-icon-btn"></button>
+            </div>
+            <button pButton type="button" 
+                    [icon]="isRecipeInMenu(r) ? 'pi pi-check' : 'pi pi-plus'" 
+                    [label]="isRecipeInMenu(r) ? 'Au menu' : 'Ajouter'" 
+                    [severity]="isRecipeInMenu(r) ? 'success' : 'primary'"
+                    [text]="isRecipeInMenu(r)"
+                    size="small"
+                    (click)="toggleRecipeInMenu(r)">
+            </button>
+          </div>
+
+          <div *ngIf="getMatchingRecipesByTag().length === 0" class="no-tag-match">
+            <p>Aucune recette trouvée avec le tag "{{ selectedTag }}".</p>
+          </div>
+        </div>
+
+        <ng-template #selectTagPrompt>
+          <div class="select-tag-prompt flex-column flex-center">
+            <i class="pi pi-search prompt-icon"></i>
+            <p class="prompt-text">Sélectionnez un tag pour afficher et ajouter des recettes adaptées.</p>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+
+    <!-- 5. Ce que j'ai en stock (avec les recettes proposées affichées directement sous la carte) -->
     <div class="app-card section-card">
       <div class="section-header flex-between">
         <h2 class="section-title"><i class="pi pi-box section-icon"></i> En stock</h2>
@@ -66,9 +146,37 @@
       <div style="margin-top: 1rem;">
         <button pButton type="button" icon="pi pi-search" label="Quelles recettes avec ce stock ?" severity="secondary" size="small" style="width: 100%;" (click)="proposerRecettes()"></button>
       </div>
+
+      <!-- Recettes proposées avec ce stock (apparaît directement sous la carte En stock) -->
+      <div *ngIf="recettesMatch" class="proposed-stock-block" style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+        <div class="flex-between" style="margin-bottom: 0.75rem;">
+          <h3 class="section-title" style="font-size: 0.95rem; color: var(--primary-dark); margin-bottom: 0;">
+            <i class="pi pi-sparkles"></i> Recettes proposées avec votre stock
+          </h3>
+          <button pButton type="button" icon="pi pi-times" [text]="true" size="small" (click)="recettesMatch = null; selectedRecipes = []" pTooltip="Fermer"></button>
+        </div>
+        <p-table #dt [value]="recettesMatch" [(selection)]="selectedRecipes" dataKey="id"
+                 [rowHover]="true" [rows]="5" [paginator]="true" styleClass="modern-table">
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="width: 3em;"><p-tableHeaderCheckbox></p-tableHeaderCheckbox></th>
+              <th pSortableColumn="titre">Titre <p-sortIcon field="titre"></p-sortIcon></th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-recipe>
+            <tr>
+              <td><p-tableCheckbox [value]="recipe"></p-tableCheckbox></td>
+              <td>
+                <span class="font-bold">{{ recipe.titre }}</span>
+                <div class="text-xs text-muted">{{ recipe.stringIngredients }}</div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
     </div>
 
-    <!-- 4. Autres produits -->
+    <!-- 6. Autres produits -->
     <div class="app-card section-card">
       <div class="section-header flex-between">
         <h2 class="section-title"><i class="pi pi-shopping-bag section-icon"></i> Autres besoins</h2>
@@ -89,31 +197,6 @@
     </div>
   </div>
 
-  <!-- Recettes proposées avec le stock -->
-  <div *ngIf="recettesMatch" class="app-card proposed-card">
-    <div class="flex-between" style="margin-bottom: 1rem;">
-      <h2 class="section-title"><i class="pi pi-sparkles section-icon"></i> Recettes proposées avec votre stock</h2>
-      <button pButton type="button" icon="pi pi-times" class="p-button-text p-button-sm" (click)="recettesMatch = null; selectedRecipes = []"></button>
-    </div>
-    <p-table #dt [value]="recettesMatch" [(selection)]="selectedRecipes" dataKey="id"
-             [rowHover]="true" [rows]="5" [paginator]="true" styleClass="modern-table">
-      <ng-template pTemplate="header">
-        <tr>
-          <th style="width: 3em;"><p-tableHeaderCheckbox></p-tableHeaderCheckbox></th>
-          <th pSortableColumn="titre">Titre <p-sortIcon field="titre"></p-sortIcon></th>
-          <th class="desktop-only">Ingrédients</th>
-        </tr>
-      </ng-template>
-      <ng-template pTemplate="body" let-recipe>
-        <tr>
-          <td><p-tableCheckbox [value]="recipe"></p-tableCheckbox></td>
-          <td class="font-bold">{{ recipe.titre }}</td>
-          <td class="desktop-only">{{ recipe.stringIngredients }}</td>
-        </tr>
-      </ng-template>
-    </p-table>
-  </div>
-
   <!-- Footer Actions -->
   <div class="menu-footer-bar app-card flex-between">
     <div class="footer-summary">
@@ -121,4 +204,16 @@
     </div>
     <p-button icon="pi pi-shopping-cart" label="Calculer les courses" class="p-button-lg" (click)="calculerCourses()"></p-button>
   </div>
+
+  <!-- View Instructions Dialog -->
+  <p-dialog [(visible)]="instructionsDialog" [header]="recipeForInstructions?.titre" [modal]="true" [style]="{width: '90vw', maxWidth: '550px'}" [draggable]="false" [resizable]="false">
+    <div class="instructions-view-content" style="white-space: pre-wrap; line-height: 1.6; font-size: 0.95rem; color: var(--text-color);">
+      {{ recipeForInstructions?.instructions }}
+    </div>
+    <ng-template pTemplate="footer">
+      <div class="flex-end" style="display: flex; justify-content: flex-end;">
+        <p-button label="Fermer" icon="pi pi-check" (click)="instructionsDialog = false"></p-button>
+      </div>
+    </ng-template>
+  </p-dialog>
 </div>

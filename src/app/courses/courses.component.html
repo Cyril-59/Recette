@@ -7,14 +7,28 @@
     <img class="header-icon desktop-only" src="/assets/basket.png" alt="Panier"/>
   </div>
 
+  <!-- Summary of selected recipes for these groceries -->
+  <div *ngIf="recettes && recettes.length > 0" class="app-card recipes-summary-card">
+    <h3 class="section-title"><i class="pi pi-book section-icon"></i> Recettes prévues ({{ recettes.length }})</h3>
+    <div class="recipes-chip-list">
+      <span *ngFor="let r of recettes" class="recipe-chip">
+        <i class="pi pi-check chip-icon"></i> {{ r.titre }}
+      </span>
+    </div>
+  </div>
+
   <div class="app-card editor-card">
     <p-editor #editor [(ngModel)]="text" [style]="{'height':'400px'}"></p-editor>
   </div>
 
   <div class="app-card actions-card flex-between">
-    <a href="https://www.leclercdrive.fr/" target="_blank" class="drive-link">
-      <img src="https://mgt.leclercdrive.fr/communiques/visuelpagescontenu.ashx?id=340&type=2&mindim=60" alt="Leclerc Drive" class="drive-logo"/>
-    </a>
+    <button pButton 
+            type="button" 
+            icon="pi pi-whatsapp" 
+            label="Partager sur WhatsApp" 
+            class="whatsapp-btn" 
+            (click)="shareOnWhatsApp()">
+    </button>
     <p-button icon="pi pi-copy" label="Copier la liste" class="p-button-lg" [clipboard]="editor" (copied)="notify($event)"></p-button>
   </div>
 </div>

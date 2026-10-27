@@ -1,8 +1,7 @@
-import { Component, OnInit, OnChanges, SimpleChanges, HostListener, AfterViewInit } from '@angular/core';
-import { ProduitService } from '../services/produit.service';
-import { Produit } from '../model/produit';
+import { Component, OnInit, HostListener, AfterViewInit } from '@angular/core';
 import { SelectItem } from 'primeng/api';
 import { Recette } from '../model/recette';
+import { MenuService } from '../services/menu.service';
 
 @Component({
   selector: 'app-accueil',
@@ -19,9 +18,17 @@ export class AccueilComponent implements OnInit, AfterViewInit {
   index: number = 0;
   innerWidth: number;
 
-  constructor() { }
+  showMenuPreview = false;
+  selectedRecipeDetail: Recette = null;
+
+  constructor(private menuService: MenuService) { }
 
   ngOnInit(): void {
+    this.menuService.getLatestSelection().subscribe((saved) => {
+      if (saved && saved.length > 0) {
+        this.recettesCourses = saved;
+      }
+    });
   }
 
   ngAfterViewInit(): void {
@@ -31,6 +38,15 @@ export class AccueilComponent implements OnInit, AfterViewInit {
   @HostListener('window:resize', ['$event'])
   onResize(event) {
     this.innerWidth = window.innerWidth;
+  }
+
+  openMenuPreview() {
+    this.selectedRecipeDetail = null;
+    this.showMenuPreview = true;
+  }
+
+  selectRecipeDetail(recipe: Recette) {
+    this.selectedRecipeDetail = recipe;
   }
 
   setProduits(produits) {

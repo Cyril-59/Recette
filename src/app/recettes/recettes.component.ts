@@ -21,6 +21,13 @@ export class RecettesComponent implements OnInit {
   edit = false;
   editTitle = 'Création';
 
+  instructionsDialog = false;
+  recipeForInstructions: Recette = null;
+
+  predefinedTags: string[] = ['Végétarien', 'Express (< 25 min)', 'Batch cooking', 'One Pot / Plat unique'];
+  customTagInput: string = '';
+  selectedLinkedRecipe: Recette = null;
+
   ete: boolean;
   printemps: boolean;
   automne: boolean;
@@ -52,6 +59,8 @@ export class RecettesComponent implements OnInit {
         }
         url += escape(params.substr(0, params.length - 1));
         recette.url = url;
+        recette.tags = recette.tags || [];
+        (recette as any).stringTags = (recette.tags || []).join(' ');
       }
       this.recettes = recettes;
       this.onRecettes.emit(this.recettes);
@@ -75,6 +84,8 @@ export class RecettesComponent implements OnInit {
     this.recette.ete = this.ete;
     this.recette.hiver = this.hiver;
     this.recette.printemps = this.printemps;
+    (this.recette as any).linkedRecetteIds = (this.recette.linkedRecettes || []).map(r => r.id);
+
     if (!this.recette.id) {
       this.recetteService.createRecette(this.recette).subscribe(() => {
         this.initRecette();
@@ -96,16 +107,28 @@ export class RecettesComponent implements OnInit {
 
   initRecette() {
     this.recette = new Recette();
-    this.ete = this.recette.ete
-    this.printemps = this.recette.printemps
-    this.automne = this.recette.automne
-    this.hiver = this.recette.hiver
+    this.recette.tags = [];
+    this.recette.linkedRecettes = [];
+    this.selectedLinkedRecipe = null;
+    this.customTagInput = '';
+    this.ete = this.recette.ete;
+    this.printemps = this.recette.printemps;
+    this.automne = this.recette.automne;
+    this.hiver = this.recette.hiver;
     this.recette.ingredients = [new Ingredient()];
     this.editTitle = 'Création';
   }
 
   recipeSelected(id: number) {
     this.recette = this.recettes.find((r) => r.id === id);
+    if (!this.recette.tags) {
+      this.recette.tags = [];
+    }
+    if (!this.recette.linkedRecettes) {
+      this.recette.linkedRecettes = [];
+    }
+    this.selectedLinkedRecipe = null;
+    this.customTagInput = '';
     this.automne = this.recette.automne;
     this.ete = this.recette.ete;
     this.hiver = this.recette.hiver;
@@ -118,6 +141,69 @@ export class RecettesComponent implements OnInit {
     })
   }
 
+  get otherRecettesOptions(): SelectItem[] {
+    if (!this.recettes) return [];
+    return this.recettes
+      .filter(r => r.id !== this.recette?.id)
+      .map(r => ({ label: r.titre, value: r }));
+  }
+
+  addLinkedRecipe(): void {
+    if (this.selectedLinkedRecipe) {
+      if (!this.recette.linkedRecettes) {
+        this.recette.linkedRecettes = [];
+      }
+      if (!this.recette.linkedRecettes.some(r => r.id === this.selectedLinkedRecipe.id)) {
+        this.recette.linkedRecettes.push({ id: this.selectedLinkedRecipe.id, titre: this.selectedLinkedRecipe.titre });
+      }
+      this.selectedLinkedRecipe = null;
+    }
+  }
+
+  removeLinkedRecipe(id: number): void {
+    if (this.recette.linkedRecettes) {
+      this.recette.linkedRecettes = this.recette.linkedRecettes.filter(r => r.id !== id);
+    }
+  }
+
+  hasTag(tag: string): boolean {
+    return !!this.recette?.tags?.includes(tag);
+  }
+
+  toggleTag(tag: string): void {
+    if (!this.recette.tags) {
+      this.recette.tags = [];
+    }
+    const idx = this.recette.tags.indexOf(tag);
+    if (idx > -1) {
+      this.recette.tags.splice(idx, 1);
+    } else {
+      this.recette.tags.push(tag);
+    }
+  }
+
+  addCustomTag(): void {
+    if (this.customTagInput && this.customTagInput.trim().length > 0) {
+      const tag = this.customTagInput.trim();
+      if (!this.recette.tags) {
+        this.recette.tags = [];
+      }
+      if (!this.recette.tags.includes(tag)) {
+        this.recette.tags.push(tag);
+      }
+      this.customTagInput = '';
+    }
+  }
+
+  removeTag(tag: string): void {
+    if (this.recette.tags) {
+      const idx = this.recette.tags.indexOf(tag);
+      if (idx > -1) {
+        this.recette.tags.splice(idx, 1);
+      }
+    }
+  }
+
   deleteRecette(id: number) {
     this.recetteService.deleteRecette(id).subscribe(() => {
       this.initRecette();
@@ -127,6 +213,11 @@ export class RecettesComponent implements OnInit {
 
   goToUrl(url) {
     window.open(url, "_blank");
+  }
+
+  viewInstructions(recipe: Recette) {
+    this.recipeForInstructions = recipe;
+    this.instructionsDialog = true;
   }
 
   deduireSaison() {

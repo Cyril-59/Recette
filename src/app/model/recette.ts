@@ -3,6 +3,9 @@ import { Ingredient } from './ingredient';
 export class Recette {
     id: number;
     titre: string;
+    instructions: string;
+    tags: string[];
+    linkedRecettes: { id: number; titre: string }[];
     ingredients: Ingredient[];
     stringIngredients: string;
     tooltipIngredients: string;

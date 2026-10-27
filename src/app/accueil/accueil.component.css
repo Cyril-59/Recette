@@ -102,13 +102,87 @@
   color: var(--primary);
 }
 
+/* Quick Menu Button - Mobile */
+.quick-menu-btn-mobile {
+  position: relative;
+  background: var(--primary-light);
+  color: var(--primary-dark);
+  border: 1px solid var(--border-color);
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.quick-menu-btn-mobile i {
+  font-size: 1.2rem;
+}
+
+.quick-badge-mobile {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background-color: var(--primary);
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 700;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+}
+
 /* Main Content Area */
 .app-content {
   flex: 1;
   margin-left: var(--sidebar-width);
-  padding: 2rem;
+  padding: 1.5rem 2rem 2rem 2rem;
   min-height: 100vh;
   max-width: 1400px;
+}
+
+/* Header Actions (Desktop) */
+.app-header-actions {
+  margin-bottom: 1rem;
+}
+
+.quick-menu-btn-desktop {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: var(--surface-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  padding: 0.6rem 1rem;
+  border-radius: var(--radius-full);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+}
+
+.quick-menu-btn-desktop:hover {
+  background-color: var(--primary-light);
+  border-color: var(--primary);
+  color: var(--primary-dark);
+  transform: translateY(-1px);
+}
+
+.quick-badge-desktop {
+  background-color: var(--primary);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.15rem 0.55rem;
+  border-radius: var(--radius-full);
 }
 
 @media (max-width: 768px) {
@@ -173,4 +247,149 @@
   justify-content: center;
   align-items: center;
   z-index: 999;
+}
+
+/* Planned Recipes Modal Styles */
+.preview-subtitle {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.planned-recipe-item {
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.planned-recipe-item:hover {
+  background: var(--primary-light);
+  border-color: var(--primary);
+  transform: translateX(3px);
+}
+
+.recipe-item-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-color);
+  margin-bottom: 0.2rem;
+}
+
+.recipe-item-ingredients-count {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.has-instructions-pill {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--primary-dark);
+  background: white;
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--primary);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.chevron-icon {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.empty-menu-box {
+  padding: 2.5rem 1rem;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 2.5rem;
+  color: var(--text-muted);
+}
+
+.empty-text {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+/* Recipe Detail View */
+.back-link-btn {
+  align-self: flex-start;
+  padding: 0 !important;
+}
+
+.detail-header {
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.75rem;
+}
+
+.detail-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.detail-google-link {
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.detail-google-link:hover {
+  color: #ea4335;
+}
+
+.detail-box {
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+}
+
+.detail-box-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-color);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.detail-box-title i {
+  color: var(--primary);
+}
+
+.detail-ingredients-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.4rem;
+  font-size: 0.9rem;
+}
+
+.detail-instructions-text {
+  white-space: pre-wrap;
+  line-height: 1.6;
+  font-size: 0.95rem;
+  color: var(--text-color);
+}
+
+.no-instructions-box {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.text-hint {
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
 }

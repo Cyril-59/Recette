@@ -11,7 +11,7 @@
   <div class="app-card filters-card">
     <div class="search-input-wrapper">
       <i class="pi pi-search search-icon"></i>
-      <input pInputText type="text" (input)="dt.filterGlobal($event.target.value, 'contains')" placeholder="Rechercher par titre ou ingrédient..." class="search-input">
+      <input pInputText type="text" (input)="dt.filterGlobal($event.target.value, 'contains')" placeholder="Rechercher par titre, ingrédient ou tag (Végétarien, Express...)..." class="search-input">
     </div>
     <div class="season-filters">
       <span class="filter-label">Saisons :</span>
@@ -39,14 +39,14 @@
     <p-table #dt [value]="recettes" dataKey="id" [rowHover]="true"
              [rows]="10" [showCurrentPageReport]="true" [rowsPerPageOptions]="[10,25,50]"
              [paginator]="true" currentPageReportTemplate="{first} à {last} sur {totalRecords}"
-             [filterDelay]="0" [globalFilterFields]="['titre', 'stringIngredients']"
+             [filterDelay]="0" [globalFilterFields]="['titre', 'stringIngredients', 'stringTags']"
              styleClass="modern-table">
       <ng-template pTemplate="header">
         <tr>
           <th pSortableColumn="titre">Titre <p-sortIcon field="titre"></p-sortIcon></th>
           <th>Ingrédients</th>
           <th>Saisons</th>
-          <th style="width: 100px; text-align: center;">Actions</th>
+          <th style="width: 130px; text-align: center;">Actions</th>
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-recipe>
@@ -57,6 +57,12 @@
               <a *ngIf="recipe.url" [href]="recipe.url" target="_blank" class="google-link" pTooltip="Recherche Google">
                 <i class="pi pi-google"></i>
               </a>
+            </div>
+            <div class="tags-container" *ngIf="(recipe.tags && recipe.tags.length > 0) || (recipe.linkedRecettes && recipe.linkedRecettes.length > 0)">
+              <span *ngFor="let t of recipe.tags" class="tag-badge" [ngClass]="{'tag-vege': t === 'Végétarien', 'tag-express': t.startsWith('Express')}">{{ t }}</span>
+              <span *ngIf="recipe.linkedRecettes && recipe.linkedRecettes.length > 0" class="tag-badge tag-anti-gaspi" pTooltip="Recettes liées anti-gaspillage">
+                <i class="pi pi-link"></i> {{ recipe.linkedRecettes.length }} liée(s)
+              </span>
             </div>
           </td>
           <td>
@@ -69,6 +75,7 @@
             <span *ngIf="recipe.hiver" class="badge badge-winter">Hiver</span>
           </td>
           <td style="text-align: center;">
+            <button *ngIf="recipe.instructions" pButton type="button" icon="pi pi-align-left" [text]="true" [rounded]="true" pTooltip="Voir la préparation" (click)="viewInstructions(recipe)"></button>
             <button pButton type="button" icon="pi pi-pencil" [text]="true" [rounded]="true" (click)="recipeSelected(recipe.id)"></button>
             <button pButton type="button" icon="pi pi-trash" severity="danger" [text]="true" [rounded]="true" (click)="deleteRecette(recipe.id)"></button>
           </td>
@@ -95,10 +102,22 @@
           <button pButton type="button" icon="pi pi-trash" severity="danger" [text]="true" [rounded]="true" (click)="deleteRecette(recipe.id)"></button>
         </div>
       </div>
+
+      <div class="tags-container" *ngIf="(recipe.tags && recipe.tags.length > 0) || (recipe.linkedRecettes && recipe.linkedRecettes.length > 0)" style="margin-top: 0.25rem;">
+        <span *ngFor="let t of recipe.tags" class="tag-badge" [ngClass]="{'tag-vege': t === 'Végétarien', 'tag-express': t.startsWith('Express')}">{{ t }}</span>
+        <span *ngIf="recipe.linkedRecettes && recipe.linkedRecettes.length > 0" class="tag-badge tag-anti-gaspi">
+          <i class="pi pi-link"></i> {{ recipe.linkedRecettes.length }} liée(s)
+        </span>
+      </div>
+
       <div class="recipe-details">
         <div class="detail-row">
           <span class="detail-label">Ingrédients :</span>
           <span class="ingredients-text">{{ recipe.stringIngredients }}</span>
+        </div>
+        <div *ngIf="recipe.instructions" class="detail-row">
+          <span class="detail-label">Étapes :</span>
+          <button pButton label="Voir la préparation" icon="pi pi-align-left" [text]="true" size="small" (click)="viewInstructions(recipe)" style="padding: 0;"></button>
         </div>
         <div class="detail-row">
           <span class="detail-label">Saisons :</span>
@@ -127,6 +146,56 @@
       <div>
         <label class="form-label">Titre de la recette</label>
         <input type="text" pInputText [(ngModel)]="recette.titre" placeholder="ex: Dahl de lentilles" style="width: 100%;">
+      </div>
+
+      <!-- Tags Section -->
+      <div class="tags-form-section">
+        <label class="form-label">Tags / Catégories</label>
+        <div class="predefined-tags-grid">
+          <button *ngFor="let t of predefinedTags"
+                  type="button"
+                  class="tag-toggle-btn"
+                  [class.active]="hasTag(t)"
+                  (click)="toggleTag(t)">
+            <i class="pi" [ngClass]="hasTag(t) ? 'pi-check' : 'pi-plus'"></i>
+            {{ t }}
+          </button>
+        </div>
+
+        <div class="custom-tag-row flex-center gap-sm" style="margin-top: 0.6rem;">
+          <input type="text" pInputText [(ngModel)]="customTagInput" placeholder="Ajouter un tag personnalisé (ex: Sans gluten)" style="flex: 1;" (keydown.enter)="addCustomTag()">
+          <button pButton type="button" icon="pi pi-plus" label="Ajouter" size="small" [outlined]="true" (click)="addCustomTag()"></button>
+        </div>
+
+        <div *ngIf="recette.tags && recette.tags.length > 0" class="active-tags-chips-list flex-wrap gap-xs" style="margin-top: 0.6rem;">
+          <span *ngFor="let t of recette.tags" class="tag-badge tag-badge-removable" (click)="removeTag(t)" pTooltip="Cliquer pour retirer">
+            {{ t }} <i class="pi pi-times remove-tag-icon"></i>
+          </span>
+        </div>
+      </div>
+
+      <!-- Section Recettes Liées (Anti-gaspillage) -->
+      <div class="tags-form-section">
+        <div class="flex-between" style="margin-bottom: 0.35rem;">
+          <label class="form-label" style="margin-bottom: 0;"><i class="pi pi-link" style="color: var(--primary);"></i> Recettes liées (Anti-gaspillage)</label>
+          <span style="font-size: 0.8rem; color: var(--text-muted);">Associez des recettes partageant des ingrédients entamés</span>
+        </div>
+        
+        <div class="flex-center gap-sm" style="margin-top: 0.6rem;">
+          <p-dropdown [filter]="true" [options]="otherRecettesOptions" [(ngModel)]="selectedLinkedRecipe" placeholder="Choisir une recette à lier" [style]="{flex: '1'}"></p-dropdown>
+          <button pButton type="button" icon="pi pi-plus" label="Lier" size="small" [outlined]="true" (click)="addLinkedRecipe()"></button>
+        </div>
+
+        <div *ngIf="recette.linkedRecettes && recette.linkedRecettes.length > 0" class="active-tags-chips-list flex-wrap gap-xs" style="margin-top: 0.6rem;">
+          <span *ngFor="let lr of recette.linkedRecettes" class="tag-badge tag-badge-removable tag-anti-gaspi" (click)="removeLinkedRecipe(lr.id)" pTooltip="Cliquer pour délier">
+            <i class="pi pi-link"></i> {{ lr.titre }} <i class="pi pi-times remove-tag-icon"></i>
+          </span>
+        </div>
+      </div>
+
+      <div>
+        <label class="form-label">Instructions de préparation</label>
+        <textarea [(ngModel)]="recette.instructions" placeholder="Étapes de préparation, temps de cuisson, astuces..." rows="4" class="p-inputtext" style="width: 100%; border-radius: var(--radius-md); font-family: inherit; font-size: 0.95rem; resize: vertical;"></textarea>
       </div>
 
       <div>
@@ -173,6 +242,18 @@
       <div class="flex-end gap-sm" style="display: flex; justify-content: flex-end;">
         <p-button label="Annuler" icon="pi pi-times" [text]="true" (click)="edit = false"></p-button>
         <p-button label="Enregistrer" icon="pi pi-check" (click)="creerRecette()"></p-button>
+      </div>
+    </ng-template>
+  </p-dialog>
+
+  <!-- View Instructions Dialog -->
+  <p-dialog [(visible)]="instructionsDialog" [header]="recipeForInstructions?.titre" [modal]="true" [style]="{width: '90vw', maxWidth: '550px'}" [draggable]="false" [resizable]="false">
+    <div class="instructions-view-content" style="white-space: pre-wrap; line-height: 1.6; font-size: 0.95rem; color: var(--text-color);">
+      {{ recipeForInstructions?.instructions }}
+    </div>
+    <ng-template pTemplate="footer">
+      <div class="flex-end" style="display: flex; justify-content: flex-end;">
+        <p-button label="Fermer" icon="pi pi-check" (click)="instructionsDialog = false"></p-button>
       </div>
     </ng-template>
   </p-dialog>

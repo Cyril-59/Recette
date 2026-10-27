@@ -2,6 +2,7 @@ import { Component, OnInit, Input, OnChanges, SimpleChanges, EventEmitter, Outpu
 import { Recette } from '../model/recette';
 import { Ingredient } from '../model/ingredient';
 import { SelectItem, MessageService } from 'primeng/api';
+import { MenuService } from '../services/menu.service';
 
 @Component({
   selector: 'app-stocks',
@@ -23,6 +24,13 @@ export class StocksComponent implements OnInit, OnChanges {
   optionsSaisons: SelectItem[];
   courses: Map<string, Ingredient[]>;
   coursesText: string;
+
+  availableTags: string[] = ['Végétarien', 'Express (< 25 min)', 'Batch cooking', 'One Pot / Plat unique'];
+  allTags: string[] = ['Végétarien', 'Express (< 25 min)', 'Batch cooking', 'One Pot / Plat unique'];
+  selectedTag: string = null;
+  instructionsDialog = false;
+  recipeForInstructions: Recette = null;
+
   mois: string[] = []
   hiver = [1, 2, 3, 12]
   printemps = [3, 4, 5, 6]
@@ -30,7 +38,7 @@ export class StocksComponent implements OnInit, OnChanges {
   automne = [9, 10, 11, 12]
   @Output() onCourses = new EventEmitter<string>();
 
-  constructor(public messageService: MessageService) { }
+  constructor(public messageService: MessageService, private menuService: MenuService) { }
 
   ngOnInit(): void {
     const cemois = new Date().getMonth() + 1;
@@ -88,8 +96,141 @@ export class StocksComponent implements OnInit, OnChanges {
         if (!this.optionsSaisons.map(o => o.value).includes(o.value)) {
           this.options.push(o)
         }
-      })
+      });
+
+      if (this.recettesCourses && this.recettesCourses.length === 0) {
+        this.menuService.getLatestSelection().subscribe(saved => {
+          if (saved && saved.length > 0) {
+            this.recettesCourses.push(...saved);
+          }
+        });
+      }
+
+      this.updateAvailableTags();
     }
+  }
+
+  updateAvailableTags() {
+    const set = new Set(this.availableTags);
+    if (this.recettes) {
+      for (const r of this.recettes) {
+        if (r.tags) {
+          r.tags.forEach(t => set.add(t));
+        }
+      }
+    }
+    this.allTags = Array.from(set);
+  }
+
+  selectTag(tag: string) {
+    if (this.selectedTag === tag) {
+      this.selectedTag = null;
+    } else {
+      this.selectedTag = tag;
+    }
+  }
+
+  getAllMenuRecipes(): Recette[] {
+    const list: Recette[] = [];
+    if (this.recettesSaison) {
+      list.push(...this.recettesSaison.filter(r => !!r && !!r.id && !!r.titre));
+    }
+    if (this.autresRecettes) {
+      list.push(...this.autresRecettes.filter(r => !!r && !!r.id && !!r.titre));
+    }
+    if (this.selectedRecipes) {
+      list.push(...this.selectedRecipes.filter(r => !!r && !!r.id && !!r.titre));
+    }
+    return list;
+  }
+
+  getAntiGaspiSuggestions(): { sourceRecipe: Recette; suggestedRecipe: Recette }[] {
+    if (!this.recettes) return [];
+    const currentMenu = this.getAllMenuRecipes();
+    if (currentMenu.length === 0) return [];
+
+    const menuIds = new Set(currentMenu.map(r => r.id));
+    const suggestionsMap = new Map<number, { sourceRecipe: Recette; suggestedRecipe: Recette }>();
+
+    for (const menuR of currentMenu) {
+      const fullSource = this.recettes.find(r => r.id === menuR.id);
+      const links = fullSource?.linkedRecettes || menuR.linkedRecettes;
+      if (links && links.length > 0) {
+        for (const lr of links) {
+          if (!menuIds.has(lr.id) && !suggestionsMap.has(lr.id)) {
+            const target = this.recettes.find(r => r.id === lr.id);
+            if (target) {
+              suggestionsMap.set(lr.id, { sourceRecipe: menuR, suggestedRecipe: target });
+            }
+          }
+        }
+      }
+      // Check reciprocal links: any recipe in this.recettes that links to menuR
+      for (const candidate of this.recettes) {
+        if (!menuIds.has(candidate.id) && candidate.linkedRecettes && !suggestionsMap.has(candidate.id)) {
+          if (candidate.linkedRecettes.some(l => l.id === menuR.id)) {
+            suggestionsMap.set(candidate.id, { sourceRecipe: menuR, suggestedRecipe: candidate });
+          }
+        }
+      }
+    }
+
+    return Array.from(suggestionsMap.values());
+  }
+
+  getMatchingRecipesByTag(): Recette[] {
+    if (!this.selectedTag || !this.recettes) return [];
+    return this.recettes.filter(r => r.tags && r.tags.includes(this.selectedTag));
+  }
+
+  isRecipeInMenu(recipe: Recette): boolean {
+    if (!recipe || !recipe.id) return false;
+    const inSaison = this.recettesSaison?.some(r => r.id === recipe.id);
+    const inAutres = this.autresRecettes?.some(r => r.id === recipe.id);
+    const inSelected = this.selectedRecipes?.some(r => r.id === recipe.id);
+    return !!(inSaison || inAutres || inSelected);
+  }
+
+  toggleRecipeInMenu(recipe: Recette) {
+    if (this.isRecipeInMenu(recipe)) {
+      if (this.recettesSaison) {
+        const idx = this.recettesSaison.findIndex(r => r.id === recipe.id);
+        if (idx > -1) this.recettesSaison.splice(idx, 1);
+      }
+      if (this.autresRecettes) {
+        const idx = this.autresRecettes.findIndex(r => r.id === recipe.id);
+        if (idx > -1) this.autresRecettes.splice(idx, 1);
+      }
+      if (this.selectedRecipes) {
+        const idx = this.selectedRecipes.findIndex(r => r.id === recipe.id);
+        if (idx > -1) this.selectedRecipes.splice(idx, 1);
+      }
+      this.messageService.add({severity:'info', summary:'Retirée du menu', detail: recipe.titre});
+    } else {
+      const isSaison = recipe.automne && this.mois.includes('automne') ||
+                       recipe.ete && this.mois.includes('ete') ||
+                       recipe.hiver && this.mois.includes('hiver') ||
+                       recipe.printemps && this.mois.includes('printemps');
+      if (isSaison) {
+        if (this.recettesSaison.length === 1 && !this.recettesSaison[0].titre) {
+          this.recettesSaison = [recipe];
+        } else {
+          this.recettesSaison.push(recipe);
+        }
+      } else {
+        if (this.autresRecettes.length === 1 && !this.autresRecettes[0].titre) {
+          this.autresRecettes = [recipe];
+        } else {
+          this.autresRecettes.push(recipe);
+        }
+      }
+      this.messageService.add({severity:'success', summary:'Ajoutée au menu', detail: recipe.titre});
+    }
+  }
+
+  viewInstructions(recipe: Recette) {
+    this.recipeForInstructions = recipe;
+    this.instructionsDialog = true;
   }
 
   proposerRecettes() {
@@ -286,10 +427,18 @@ export class StocksComponent implements OnInit, OnChanges {
     this.onCourses.emit(copy + '</p>');
 
     this.recettesCourses.length = 0;
+    const idsToSave: number[] = [];
     for (const recette of selectedRecettes) {
-    if (recette.titre) {
-      this.recettesCourses.push(recette);
+      if (recette.titre) {
+        this.recettesCourses.push(recette);
+        if (recette.id) {
+          idsToSave.push(recette.id);
+        }
       }
+    }
+
+    if (idsToSave.length > 0) {
+      this.menuService.saveSelection(idsToSave).subscribe();
     }
   }
 
