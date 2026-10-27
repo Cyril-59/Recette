@@ -17,7 +17,7 @@
       </div>
       <div class="items-list flex-column gap-sm">
         <div *ngFor="let recetteSaison of recettesSaison; index as idx" class="item-row">
-          <p-dropdown [filter]="true" [options]="optionsSaisons" [(ngModel)]="recettesSaison[idx]" placeholder="Choisir une recette" [style]="{flex: '1'}"></p-dropdown>
+          <p-dropdown [filter]="true" [autofocusFilter]="false" [options]="optionsSaisons" [(ngModel)]="recettesSaison[idx]" placeholder="Choisir une recette" [style]="{flex: '1'}"></p-dropdown>
           <button pButton type="button" icon="pi pi-trash" severity="danger" [text]="true" size="small" (click)="enleverRecette(idx, 1)"></button>
         </div>
       </div>
@@ -35,7 +35,7 @@
       </div>
       <div class="items-list flex-column gap-sm">
         <div *ngFor="let autreRecette of autresRecettes; index as idx" class="item-row">
-          <p-dropdown [filter]="true" [options]="options" [(ngModel)]="autresRecettes[idx]" placeholder="Choisir une recette" [style]="{flex: '1'}"></p-dropdown>
+          <p-dropdown [filter]="true" [autofocusFilter]="false" [options]="options" [(ngModel)]="autresRecettes[idx]" placeholder="Choisir une recette" [style]="{flex: '1'}"></p-dropdown>
           <button pButton type="button" icon="pi pi-trash" severity="danger" [text]="true" size="small" (click)="enleverRecette(idx, 2)"></button>
         </div>
       </div>
@@ -89,7 +89,6 @@
                   class="tag-filter-pill"
                   [class.active]="selectedTag === t"
                   (click)="selectTag(t)">
-            <i class="pi pi-tag tag-pill-icon"></i>
             {{ t }}
           </button>
         </div>
@@ -133,7 +132,7 @@
       </div>
       <div class="items-list flex-column gap-sm">
         <div *ngFor="let ingredient of ingredients; index as idx" class="item-row">
-          <p-dropdown [filter]="true" [options]="produits" [(ngModel)]="ingredient.produit" placeholder="Produit" [style]="{flex: '1'}"></p-dropdown>
+          <p-dropdown [filter]="true" [autofocusFilter]="false" [options]="produits" [(ngModel)]="ingredient.produit" placeholder="Produit" [style]="{flex: '1'}"></p-dropdown>
           <input type="number" pInputText [(ngModel)]="ingredient.quantite" placeholder="Qtt" style="width: 60px;">
           <span class="unit-badge" *ngIf="ingredient.produit?.unite">{{ ingredient.produit.unite }}</span>
           <button pButton type="button" icon="pi pi-trash" severity="danger" [text]="true" size="small" (click)="enleverIngredient(idx)"></button>
@@ -147,32 +146,26 @@
         <button pButton type="button" icon="pi pi-search" label="Quelles recettes avec ce stock ?" severity="secondary" size="small" style="width: 100%;" (click)="proposerRecettes()"></button>
       </div>
 
-      <!-- Recettes proposées avec ce stock (apparaît directement sous la carte En stock) -->
-      <div *ngIf="recettesMatch" class="proposed-stock-block" style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
-        <div class="flex-between" style="margin-bottom: 0.75rem;">
+      <!-- Recettes proposées avec ce stock (sélection multiple) -->
+      <div *ngIf="recettesMatch && recettesMatch.length > 0" class="proposed-stock-block" style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+        <div class="flex-between" style="margin-bottom: 0.6rem;">
           <h3 class="section-title" style="font-size: 0.95rem; color: var(--primary-dark); margin-bottom: 0;">
-            <i class="pi pi-sparkles"></i> Recettes proposées avec votre stock
+            <i class="pi pi-sparkles"></i> Recettes proposées ({{ recettesMatch.length }})
           </h3>
-          <button pButton type="button" icon="pi pi-times" [text]="true" size="small" (click)="recettesMatch = null; selectedRecipes = []" pTooltip="Fermer"></button>
+          <button pButton type="button" icon="pi pi-times" [text]="true" size="small" (click)="recettesMatch = null; selectedRecipes = []; optionsRecettesMatch = []" pTooltip="Fermer"></button>
         </div>
-        <p-table #dt [value]="recettesMatch" [(selection)]="selectedRecipes" dataKey="id"
-                 [rowHover]="true" [rows]="5" [paginator]="true" styleClass="modern-table">
-          <ng-template pTemplate="header">
-            <tr>
-              <th style="width: 3em;"><p-tableHeaderCheckbox></p-tableHeaderCheckbox></th>
-              <th pSortableColumn="titre">Titre <p-sortIcon field="titre"></p-sortIcon></th>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="body" let-recipe>
-            <tr>
-              <td><p-tableCheckbox [value]="recipe"></p-tableCheckbox></td>
-              <td>
-                <span class="font-bold">{{ recipe.titre }}</span>
-                <div class="text-xs text-muted">{{ recipe.stringIngredients }}</div>
-              </td>
-            </tr>
-          </ng-template>
-        </p-table>
+        <p-multiSelect [options]="optionsRecettesMatch"
+                       [(ngModel)]="selectedRecipes"
+                       [filter]="true"
+                       [autofocusFilter]="false"
+                       [maxSelectedLabels]="1"
+                       defaultLabel="Choisir parmi les recettes..."
+                       selectedItemsLabel="{0} recettes sélectionnées"
+                       [style]="{width: '100%'}">
+        </p-multiSelect>
+      </div>
+      <div *ngIf="recettesMatch && recettesMatch.length === 0" style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted); text-align: center;">
+        Aucune recette trouvée avec ce stock.
       </div>
     </div>
 
@@ -184,7 +177,7 @@
       </div>
       <div class="items-list flex-column gap-sm">
         <div *ngFor="let ingredient of ingredientsAutres; index as idx" class="item-row">
-          <p-dropdown [filter]="true" [options]="produits" [(ngModel)]="ingredient.produit" placeholder="Produit" [style]="{flex: '1'}"></p-dropdown>
+          <p-dropdown [filter]="true" [autofocusFilter]="false" [options]="produits" [(ngModel)]="ingredient.produit" placeholder="Produit" [style]="{flex: '1'}"></p-dropdown>
           <input type="number" pInputText [(ngModel)]="ingredient.quantite" placeholder="Qtt" style="width: 60px;">
           <span class="unit-badge" *ngIf="ingredient.produit?.unite">{{ ingredient.produit.unite }}</span>
           <button pButton type="button" icon="pi pi-trash" severity="danger" [text]="true" size="small" (click)="enleverIngredientAutres(idx)"></button>

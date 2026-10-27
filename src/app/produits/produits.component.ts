@@ -28,6 +28,29 @@ export class ProduitsComponent implements OnInit {
   edit = false;
   editTitle = 'Création';
 
+  selectedTypeFilter: string = null;
+
+  filterPrintemps = false;
+  filterEte = false;
+  filterAutomne = false;
+  filterHiver = false;
+
+  toggleSeasonFilter(season: 'printemps' | 'ete' | 'automne' | 'hiver', dt: any): void {
+    if (season === 'printemps') {
+      this.filterPrintemps = !this.filterPrintemps;
+      dt.filter(this.filterPrintemps ? true : null, 'printemps', 'equals');
+    } else if (season === 'ete') {
+      this.filterEte = !this.filterEte;
+      dt.filter(this.filterEte ? true : null, 'ete', 'equals');
+    } else if (season === 'automne') {
+      this.filterAutomne = !this.filterAutomne;
+      dt.filter(this.filterAutomne ? true : null, 'automne', 'equals');
+    } else if (season === 'hiver') {
+      this.filterHiver = !this.filterHiver;
+      dt.filter(this.filterHiver ? true : null, 'hiver', 'equals');
+    }
+  }
+
   @Output() onProduits = new EventEmitter<Produit[]>();
 
   constructor(public produitService: ProduitService, private messageService: MessageService) { }
@@ -55,6 +78,16 @@ export class ProduitsComponent implements OnInit {
     }
   }
 
+  filterByType(type: string, dt: any): void {
+    if (this.selectedTypeFilter === type) {
+      this.selectedTypeFilter = null;
+      dt.filter(null, 'type', 'equals');
+    } else {
+      this.selectedTypeFilter = type;
+      dt.filter(type, 'type', 'equals');
+    }
+  }
+
   creerProduit() {
     let produit = this.produits.find((p) => p.id === this.produitId);
     if (!produit) {
@@ -69,12 +102,14 @@ export class ProduitsComponent implements OnInit {
     produit.type = this.type;
     if (!produit.id) {
       this.produitService.createProduit(produit).subscribe(() => {
+        this.edit = false;
         this.getProduits();
         this.cleanProduit();
         this.messageService.add({severity:'success', summary:'Création effectuée', detail:'Produit créé'});
       });
     } else {
       this.produitService.updateProduit(produit).subscribe(() => {
+        this.edit = false;
         this.getProduits();
         this.cleanProduit();
         this.messageService.add({severity:'success', summary:'Modification effectuée', detail:'Produit modifié'});
@@ -84,6 +119,22 @@ export class ProduitsComponent implements OnInit {
 
   getProduits() {
     this.produitService.getProduits().subscribe((produits) => {
+      for (const p of produits) {
+        if (p.type) {
+          const t = p.type.trim();
+          if (t.toLowerCase() === 'épicerie vrac' || t.toLowerCase() === 'vrac') {
+            p.type = 'Vrac';
+          } else if (t.toLowerCase() === 'légume' || t.toLowerCase() === 'legume') {
+            p.type = 'Légume';
+          } else if (t.toLowerCase() === 'frais') {
+            p.type = 'Frais';
+          } else if (t.toLowerCase() === 'épicerie' || t.toLowerCase() === 'epicerie') {
+            p.type = 'Épicerie';
+          } else {
+            p.type = t.charAt(0).toUpperCase() + t.slice(1);
+          }
+        }
+      }
       this.produits = produits;
       this.initOptions();
       this.onProduits.emit(this.produits);
@@ -99,12 +150,13 @@ export class ProduitsComponent implements OnInit {
       return {value: p.id, label: p.label}
     });
     this.types = [];
-    const types = new Set(this.produits.map((p) => p.type));
-    for (const type of types) {
+    const types = new Set(this.produits.map((p) => p.type).filter(t => !!t));
+    const sortedTypes = Array.from(types).sort();
+    for (const type of sortedTypes) {
       this.types.push({value: type, label: type});
     }
     this.unites = [];
-    const unites = new Set(this.produits.map((p) => p.unite));
+    const unites = new Set(this.produits.map((p) => p.unite).filter(u => !!u));
     for (const unite of unites) {
       this.unites.push({value: unite, label: unite});
     }

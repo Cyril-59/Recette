@@ -20,13 +20,14 @@ export class StocksComponent implements OnInit, OnChanges {
   autresRecettes: Recette[];
   recettesSaison: Recette[];
   selectedRecipes: Recette[];
+  optionsRecettesMatch: SelectItem[] = [];
   options: SelectItem[] = [];
   optionsSaisons: SelectItem[];
   courses: Map<string, Ingredient[]>;
   coursesText: string;
 
-  availableTags: string[] = ['Végétarien', 'Express (< 25 min)', 'Batch cooking', 'One Pot / Plat unique'];
-  allTags: string[] = ['Végétarien', 'Express (< 25 min)', 'Batch cooking', 'One Pot / Plat unique'];
+  availableTags: string[] = ['Végétarien', 'Express', 'Batch cooking'];
+  allTags: string[] = ['Végétarien', 'Express', 'Batch cooking'];
   selectedTag: string = null;
   instructionsDialog = false;
   recipeForInstructions: Recette = null;
@@ -98,14 +99,6 @@ export class StocksComponent implements OnInit, OnChanges {
         }
       });
 
-      if (this.recettesCourses && this.recettesCourses.length === 0) {
-        this.menuService.getLatestSelection().subscribe(saved => {
-          if (saved && saved.length > 0) {
-            this.recettesCourses.push(...saved);
-          }
-        });
-      }
-
       this.updateAvailableTags();
     }
   }
@@ -131,17 +124,23 @@ export class StocksComponent implements OnInit, OnChanges {
   }
 
   getAllMenuRecipes(): Recette[] {
-    const list: Recette[] = [];
-    if (this.recettesSaison) {
-      list.push(...this.recettesSaison.filter(r => !!r && !!r.id && !!r.titre));
-    }
-    if (this.autresRecettes) {
-      list.push(...this.autresRecettes.filter(r => !!r && !!r.id && !!r.titre));
-    }
-    if (this.selectedRecipes) {
-      list.push(...this.selectedRecipes.filter(r => !!r && !!r.id && !!r.titre));
-    }
-    return list;
+    const map = new Map<number | string, Recette>();
+    const addAll = (list: Recette[]) => {
+      if (list) {
+        for (const r of list) {
+          if (r && r.titre) {
+            const key = r.id || r.titre;
+            if (!map.has(key)) {
+              map.set(key, r);
+            }
+          }
+        }
+      }
+    };
+    addAll(this.recettesSaison);
+    addAll(this.autresRecettes);
+    addAll(this.selectedRecipes);
+    return Array.from(map.values());
   }
 
   getAntiGaspiSuggestions(): { sourceRecipe: Recette; suggestedRecipe: Recette }[] {
@@ -267,6 +266,14 @@ export class StocksComponent implements OnInit, OnChanges {
         }
       }
     }
+    if (this.recettesMatch && this.recettesMatch.length > 0) {
+      this.optionsRecettesMatch = this.recettesMatch.map(r => ({
+        label: r.titre,
+        value: r
+      }));
+    } else {
+      this.optionsRecettesMatch = [];
+    }
   }
 
   ajouterIngredient() {
@@ -302,25 +309,7 @@ export class StocksComponent implements OnInit, OnChanges {
   }
 
   calculerCourses() {
-    let selectedRecettes: Recette[] = [];
-    if (!!this.selectedRecipes && this.selectedRecipes.length > 0) {
-      selectedRecettes.push(...this.selectedRecipes);
-    }
-    if (!!this.recettesSaison && this.recettesSaison.length > 0) {
-      selectedRecettes.push(...this.recettesSaison);
-    }
-    if (!!this.autresRecettes && this.autresRecettes.length > 0) {
-      selectedRecettes.push(...this.autresRecettes);
-    }
-
-    /*const test = new Recette();
-    test.ingredients = [];
-    const test2 = new Ingredient();
-    test2.quantite = 1;
-    console.log(this.produits[0].value);
-    test2.produit = this.produits[0].value;
-    test.ingredients.push(test2);
-    selectedRecettes.push(test);*/
+    const selectedRecettes: Recette[] = this.getAllMenuRecipes();
 
     const map = new Map<string, number>();
     // On ajoute les produits des recettes sélectionnées
@@ -427,16 +416,9 @@ export class StocksComponent implements OnInit, OnChanges {
     this.onCourses.emit(copy + '</p>');
 
     this.recettesCourses.length = 0;
-    const idsToSave: number[] = [];
-    for (const recette of selectedRecettes) {
-      if (recette.titre) {
-        this.recettesCourses.push(recette);
-        if (recette.id) {
-          idsToSave.push(recette.id);
-        }
-      }
-    }
+    this.recettesCourses.push(...selectedRecettes);
 
+    const idsToSave = Array.from(new Set(selectedRecettes.filter(r => !!r.id).map(r => r.id)));
     if (idsToSave.length > 0) {
       this.menuService.saveSelection(idsToSave).subscribe();
     }
@@ -455,25 +437,7 @@ export class StocksComponent implements OnInit, OnChanges {
   }
 
   getNbRecettes() {
-    let nbRecette = 0;
-    if (!!this.selectedRecipes) {
-      nbRecette += this.selectedRecipes.length;
-    }
-    if (!!this.recettesSaison && this.recettesSaison.length > 0) {
-      for (const recette of this.recettesSaison) {
-        if (!!recette.titre) {
-          nbRecette++;
-        }
-      }
-    }
-    if (!!this.autresRecettes && this.autresRecettes.length > 0) {
-      for (const recette of this.autresRecettes) {
-        if (!!recette.titre) {
-          nbRecette++;
-        }
-      }
-    }
-    return nbRecette;
+    return this.getAllMenuRecipes().length;
   }
 
   notify($event) {

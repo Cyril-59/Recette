@@ -24,7 +24,9 @@ export class RecettesComponent implements OnInit {
   instructionsDialog = false;
   recipeForInstructions: Recette = null;
 
-  predefinedTags: string[] = ['Végétarien', 'Express (< 25 min)', 'Batch cooking', 'One Pot / Plat unique'];
+  predefinedTags: string[] = ['Végétarien', 'Express', 'Batch cooking'];
+  availableFilterTags: string[] = ['Végétarien', 'Express', 'Batch cooking'];
+  selectedTagFilter: string = null;
   customTagInput: string = '';
   selectedLinkedRecipe: Recette = null;
 
@@ -32,6 +34,27 @@ export class RecettesComponent implements OnInit {
   printemps: boolean;
   automne: boolean;
   hiver: boolean;
+
+  filterPrintemps = false;
+  filterEte = false;
+  filterAutomne = false;
+  filterHiver = false;
+
+  toggleSeasonFilter(season: 'printemps' | 'ete' | 'automne' | 'hiver', dt: any): void {
+    if (season === 'printemps') {
+      this.filterPrintemps = !this.filterPrintemps;
+      dt.filter(this.filterPrintemps ? true : null, 'printemps', 'equals');
+    } else if (season === 'ete') {
+      this.filterEte = !this.filterEte;
+      dt.filter(this.filterEte ? true : null, 'ete', 'equals');
+    } else if (season === 'automne') {
+      this.filterAutomne = !this.filterAutomne;
+      dt.filter(this.filterAutomne ? true : null, 'automne', 'equals');
+    } else if (season === 'hiver') {
+      this.filterHiver = !this.filterHiver;
+      dt.filter(this.filterHiver ? true : null, 'hiver', 'equals');
+    }
+  }
 
   constructor(public recetteService: RecetteService, private messageService: MessageService) { }
 
@@ -63,6 +86,13 @@ export class RecettesComponent implements OnInit {
         (recette as any).stringTags = (recette.tags || []).join(' ');
       }
       this.recettes = recettes;
+      const set = new Set(this.predefinedTags);
+      for (const r of this.recettes) {
+        if (r.tags) {
+          r.tags.forEach(t => set.add(t));
+        }
+      }
+      this.availableFilterTags = Array.from(set);
       this.onRecettes.emit(this.recettes);
     }, (error) => {
       setTimeout(() => {
@@ -88,6 +118,7 @@ export class RecettesComponent implements OnInit {
 
     if (!this.recette.id) {
       this.recetteService.createRecette(this.recette).subscribe(() => {
+        this.edit = false;
         this.initRecette();
         this.getRecettes();
         this.messageService.add({severity:'success', summary:'Création effectuée', detail:'Recette créée'});
@@ -96,6 +127,7 @@ export class RecettesComponent implements OnInit {
       });
     } else {
       this.recetteService.updateRecette(this.recette).subscribe(() => {
+        this.edit = false;
         this.initRecette();
         this.getRecettes();
         this.messageService.add({severity:'success', summary:'Modification effectuée', detail:'Recette modifiée'});
@@ -201,6 +233,16 @@ export class RecettesComponent implements OnInit {
       if (idx > -1) {
         this.recette.tags.splice(idx, 1);
       }
+    }
+  }
+
+  filterByTag(tag: string, dt: any): void {
+    if (this.selectedTagFilter === tag) {
+      this.selectedTagFilter = null;
+      dt.filter(null, 'stringTags', 'contains');
+    } else {
+      this.selectedTagFilter = tag;
+      dt.filter(tag, 'stringTags', 'contains');
     }
   }
 

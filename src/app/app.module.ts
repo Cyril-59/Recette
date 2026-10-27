@@ -21,6 +21,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { EditorModule } from 'primeng/editor';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { DialogModule } from 'primeng/dialog';
+import { MultiSelectModule } from 'primeng/multiselect';
 
 import { AccueilComponent } from './accueil/accueil.component';
 import { ProduitsComponent } from './produits/produits.component';
@@ -55,6 +56,7 @@ import { CoursesComponent } from './courses/courses.component';
     TooltipModule,
     ProgressSpinnerModule,
     DialogModule,
+    MultiSelectModule,
     FormsModule,
     HttpClientModule
   ],

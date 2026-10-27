@@ -13,24 +13,32 @@
       <i class="pi pi-search search-icon"></i>
       <input pInputText type="text" (input)="dt.filterGlobal($event.target.value, 'contains')" placeholder="Rechercher un produit..." class="search-input">
     </div>
-    <div class="season-filters">
-      <span class="filter-label">Saisons :</span>
-      <div class="checkbox-item">
-        <p-checkbox inputId="filter-printemps-p" [binary]="true" (onChange)="dt.filter($event.checked ? true : null, 'printemps', 'equals')"></p-checkbox>
-        <label for="filter-printemps-p">Printemps</label>
-      </div>
-      <div class="checkbox-item">
-        <p-checkbox inputId="filter-ete-p" [binary]="true" (onChange)="dt.filter($event.checked ? true : null, 'ete', 'equals')"></p-checkbox>
-        <label for="filter-ete-p">Été</label>
-      </div>
-      <div class="checkbox-item">
-        <p-checkbox inputId="filter-automne-p" [binary]="true" (onChange)="dt.filter($event.checked ? true : null, 'automne', 'equals')"></p-checkbox>
-        <label for="filter-automne-p">Automne</label>
-      </div>
-      <div class="checkbox-item">
-        <p-checkbox inputId="filter-hiver-p" [binary]="true" (onChange)="dt.filter($event.checked ? true : null, 'hiver', 'equals')"></p-checkbox>
-        <label for="filter-hiver-p">Hiver</label>
-      </div>
+
+    <!-- Ligne 1 : Les 4 Filtres Saisons -->
+    <div class="tag-filter-chips season-chips-row">
+      <button type="button" class="tag-chip-filter chip-season-printemps" [class.active]="filterPrintemps" (click)="toggleSeasonFilter('printemps', dt)">
+        Printemps
+      </button>
+      <button type="button" class="tag-chip-filter chip-season-ete" [class.active]="filterEte" (click)="toggleSeasonFilter('ete', dt)">
+        Été
+      </button>
+      <button type="button" class="tag-chip-filter chip-season-automne" [class.active]="filterAutomne" (click)="toggleSeasonFilter('automne', dt)">
+        Automne
+      </button>
+      <button type="button" class="tag-chip-filter chip-season-hiver" [class.active]="filterHiver" (click)="toggleSeasonFilter('hiver', dt)">
+        Hiver
+      </button>
+    </div>
+
+    <!-- Ligne 2 : Filtres Types / Rayons -->
+    <div class="tag-filter-chips other-chips-row" *ngIf="types && types.length > 0">
+      <button *ngFor="let item of types"
+              type="button"
+              class="tag-chip-filter"
+              [class.active]="selectedTypeFilter === item.value"
+              (click)="filterByType(item.value, dt)">
+        {{ item.label }}
+      </button>
     </div>
   </div>
 

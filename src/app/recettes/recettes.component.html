@@ -11,26 +11,34 @@
   <div class="app-card filters-card">
     <div class="search-input-wrapper">
       <i class="pi pi-search search-icon"></i>
-      <input pInputText type="text" (input)="dt.filterGlobal($event.target.value, 'contains')" placeholder="Rechercher par titre, ingrédient ou tag (Végétarien, Express...)..." class="search-input">
+      <input pInputText type="text" (input)="dt.filterGlobal($event.target.value, 'contains')" placeholder="Rechercher une recette..." class="search-input">
     </div>
-    <div class="season-filters">
-      <span class="filter-label">Saisons :</span>
-      <div class="checkbox-item">
-        <p-checkbox inputId="filter-printemps-r" [binary]="true" (onChange)="dt.filter($event.checked ? true : null, 'printemps', 'equals')"></p-checkbox>
-        <label for="filter-printemps-r">Printemps</label>
-      </div>
-      <div class="checkbox-item">
-        <p-checkbox inputId="filter-ete-r" [binary]="true" (onChange)="dt.filter($event.checked ? true : null, 'ete', 'equals')"></p-checkbox>
-        <label for="filter-ete-r">Été</label>
-      </div>
-      <div class="checkbox-item">
-        <p-checkbox inputId="filter-automne-r" [binary]="true" (onChange)="dt.filter($event.checked ? true : null, 'automne', 'equals')"></p-checkbox>
-        <label for="filter-automne-r">Automne</label>
-      </div>
-      <div class="checkbox-item">
-        <p-checkbox inputId="filter-hiver-r" [binary]="true" (onChange)="dt.filter($event.checked ? true : null, 'hiver', 'equals')"></p-checkbox>
-        <label for="filter-hiver-r">Hiver</label>
-      </div>
+
+    <!-- Ligne 1 : Les 4 Filtres Saisons -->
+    <div class="tag-filter-chips season-chips-row">
+      <button type="button" class="tag-chip-filter chip-season-printemps" [class.active]="filterPrintemps" (click)="toggleSeasonFilter('printemps', dt)">
+        Printemps
+      </button>
+      <button type="button" class="tag-chip-filter chip-season-ete" [class.active]="filterEte" (click)="toggleSeasonFilter('ete', dt)">
+        Été
+      </button>
+      <button type="button" class="tag-chip-filter chip-season-automne" [class.active]="filterAutomne" (click)="toggleSeasonFilter('automne', dt)">
+        Automne
+      </button>
+      <button type="button" class="tag-chip-filter chip-season-hiver" [class.active]="filterHiver" (click)="toggleSeasonFilter('hiver', dt)">
+        Hiver
+      </button>
+    </div>
+
+    <!-- Ligne 2 : Filtres Tags -->
+    <div class="tag-filter-chips other-chips-row" *ngIf="availableFilterTags && availableFilterTags.length > 0">
+      <button *ngFor="let t of availableFilterTags"
+              type="button"
+              class="tag-chip-filter"
+              [class.active]="selectedTagFilter === t"
+              (click)="filterByTag(t, dt)">
+        {{ t }}
+      </button>
     </div>
   </div>
 
@@ -182,7 +190,7 @@
         </div>
         
         <div class="flex-center gap-sm" style="margin-top: 0.6rem;">
-          <p-dropdown [filter]="true" [options]="otherRecettesOptions" [(ngModel)]="selectedLinkedRecipe" placeholder="Choisir une recette à lier" [style]="{flex: '1'}"></p-dropdown>
+          <p-dropdown [filter]="true" [autofocusFilter]="false" [options]="otherRecettesOptions" [(ngModel)]="selectedLinkedRecipe" placeholder="Choisir une recette à lier" [style]="{flex: '1'}"></p-dropdown>
           <button pButton type="button" icon="pi pi-plus" label="Lier" size="small" [outlined]="true" (click)="addLinkedRecipe()"></button>
         </div>
 
@@ -205,7 +213,7 @@
         </div>
         <div class="ingredients-form-list flex-column gap-sm">
           <div *ngFor="let ingredient of recette.ingredients; index as idx" class="ingredient-form-row">
-            <p-dropdown [filter]="true" [options]="produits" [(ngModel)]="ingredient.produit" placeholder="Sélectionner un produit" [style]="{flex: '1'}"></p-dropdown>
+            <p-dropdown [filter]="true" [autofocusFilter]="false" [options]="produits" [(ngModel)]="ingredient.produit" placeholder="Sélectionner un produit" [style]="{flex: '1'}"></p-dropdown>
             <input type="number" pInputText [(ngModel)]="ingredient.quantite" placeholder="Qtt" style="width: 70px;">
             <span class="unit-badge" *ngIf="ingredient.produit?.unite">{{ ingredient.produit.unite }}</span>
             <button pButton type="button" icon="pi pi-trash" severity="danger" [text]="true" size="small" (click)="enleverIngredient(idx)"></button>

@@ -26,7 +26,15 @@ export class AccueilComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.menuService.getLatestSelection().subscribe((saved) => {
       if (saved && saved.length > 0) {
-        this.recettesCourses = saved;
+        const unique: Recette[] = [];
+        const seen = new Set<number>();
+        for (const r of saved) {
+          if (r && r.id && !seen.has(r.id)) {
+            seen.add(r.id);
+            unique.push(r);
+          }
+        }
+        this.recettesCourses = unique;
       }
     });
   }

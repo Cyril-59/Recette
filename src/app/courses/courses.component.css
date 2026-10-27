@@ -106,3 +106,20 @@
   border-color: #128c7e !important;
   transform: translateY(-1px);
 }
+
+.whatsapp-label-desktop {
+  display: inline;
+}
+
+.whatsapp-label-mobile {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .whatsapp-label-desktop {
+    display: none;
+  }
+  .whatsapp-label-mobile {
+    display: inline;
+  }
+}
