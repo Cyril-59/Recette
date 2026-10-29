@@ -1,23 +1,18 @@
 .page-container {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
 }
 
 .page-header {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0;
 }
 
 .page-title {
   font-size: 1.75rem;
   font-weight: 700;
   color: var(--text-color);
-}
-
-.page-subtitle {
-  color: var(--text-muted);
-  font-size: 0.95rem;
-  margin-top: 0.25rem;
+  margin: 0;
 }
 
 .header-icon {

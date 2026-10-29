@@ -2,7 +2,6 @@
   <div class="page-header flex-between">
     <div>
       <h1 class="page-title">Liste de courses</h1>
-      <p class="page-subtitle">Visualisez et exportez votre liste d'ingrédients à acheter</p>
     </div>
     <img class="header-icon desktop-only" src="/assets/basket.png" alt="Panier"/>
   </div>
@@ -20,20 +19,20 @@
 
     <!-- En stock (déduit des courses) -->
     <div *ngIf="stockIngredients && stockIngredients.length > 0" class="summary-sub-section" style="margin-top: 0.75rem; padding-top: 0.6rem; border-top: 1px solid var(--border-color);">
-      <h4 class="summary-sub-title text-xs font-bold" style="color: #15803d; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.35rem;">
+      <h4 class="summary-sub-title text-xs font-bold" style="color: var(--primary-dark); margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.35rem;">
         <i class="pi pi-box"></i> En stock <span class="card-subtitle-hint">(déduit des courses)</span> :
       </h4>
       <div class="flex-wrap gap-xs">
-        <span *ngFor="let ing of stockIngredients" class="tag-badge" style="background-color: #ecfdf5; color: #065f46; border-color: #a7f3d0;">
+        <span *ngFor="let ing of stockIngredients" class="tag-badge" style="background-color: var(--primary-light); color: var(--primary-dark); border-color: rgba(16, 185, 129, 0.3);">
           <i class="pi pi-minus" style="font-size: 0.65rem;"></i> {{ ing.quantite }} {{ ing.produit?.unite }} {{ ing.produit?.label }}
         </span>
       </div>
     </div>
 
-    <!-- Autres besoins (ajouté aux courses) -->
+    <!-- À acheter (ajouté aux courses) -->
     <div *ngIf="autresIngredients && autresIngredients.length > 0" class="summary-sub-section" style="margin-top: 0.6rem; padding-top: 0.5rem; border-top: 1px solid var(--border-color);">
       <h4 class="summary-sub-title text-xs font-bold" style="color: #0369a1; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.35rem;">
-        <i class="pi pi-shopping-bag"></i> Autres besoins <span class="card-subtitle-hint">(ajouté aux courses)</span> :
+        <i class="pi pi-shopping-bag"></i> À acheter <span class="card-subtitle-hint">(ajouté aux courses)</span> :
       </h4>
       <div class="flex-wrap gap-xs">
         <span *ngFor="let ing of autresIngredients" class="tag-badge" style="background-color: #f0f9ff; color: #0369a1; border-color: #bae6fd;">

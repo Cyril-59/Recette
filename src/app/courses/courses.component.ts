@@ -66,7 +66,7 @@ export class CoursesComponent implements OnInit {
     }
 
     if (this.autresIngredients && this.autresIngredients.length > 0) {
-      message += '🛍️ *Autres besoins (ajouté aux courses) :*\n';
+      message += '🛍️ *À acheter (ajouté aux courses) :*\n';
       for (const ing of this.autresIngredients) {
         message += `• ${ing.quantite} ${ing.produit?.unite || ''} ${ing.produit?.label}\n`;
       }

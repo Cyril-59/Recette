@@ -33,7 +33,7 @@
 .app-title {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-dark);
   line-height: 1.2;
 }
 
@@ -99,7 +99,7 @@
 .app-title-small {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-dark);
 }
 
 /* Quick Menu Button - Mobile */

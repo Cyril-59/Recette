@@ -2,7 +2,6 @@
   <div class="page-header flex-between">
     <div>
       <h1 class="page-title">Menu de la semaine</h1>
-      <p class="page-subtitle">Planifiez vos repas, explorez par tags et complétez avec vos stocks</p>
     </div>
     <img class="header-icon desktop-only" src="/assets/fridge.png" alt="Frigo"/>
   </div>
@@ -13,7 +12,7 @@
     <div class="app-card section-card unified-search-card">
       <div class="section-header flex-between">
         <h2 class="section-title"><i class="pi pi-search section-icon"></i> Recherche de recettes</h2>
-        <span class="count-badge">{{ getMatchingRecipes().length }} recette(s)</span>
+        <span class="count-badge">{{ getMatchingRecipes().length }} {{ getMatchingRecipes().length > 1 ? 'recettes' : 'recette' }}</span>
       </div>
 
       <div class="unified-search-body flex-column gap-sm">
@@ -122,8 +121,8 @@
     <!-- 3. Ce que j'ai en stock (avec les recettes proposées affichées directement sous la carte) -->
     <div class="app-card section-card">
       <div class="section-header flex-between">
-        <h2 class="section-title"><i class="pi pi-box section-icon"></i> En stock <span class="card-subtitle-hint">(déduit des courses)</span></h2>
-        <span class="count-badge">{{ ingredients.length }}</span>
+        <h2 class="section-title"><i class="pi pi-box section-icon"></i> En stock</h2>
+        <span class="card-subtitle-hint">déduit des courses</span>
       </div>
       <div class="items-list flex-column gap-sm">
         <div *ngFor="let ingredient of ingredients; index as idx" class="item-row">
@@ -175,8 +174,8 @@
     <!-- 4. Autres produits -->
     <div class="app-card section-card">
       <div class="section-header flex-between">
-        <h2 class="section-title"><i class="pi pi-shopping-bag section-icon"></i> Autres besoins <span class="card-subtitle-hint">(ajouté aux courses)</span></h2>
-        <span class="count-badge">{{ ingredientsAutres.length }}</span>
+        <h2 class="section-title"><i class="pi pi-shopping-bag section-icon"></i> À acheter</h2>
+        <span class="card-subtitle-hint">ajouté aux courses</span>
       </div>
       <div class="items-list flex-column gap-sm">
         <div *ngFor="let ingredient of ingredientsAutres; index as idx" class="item-row">
@@ -194,27 +193,73 @@
   </div>
 
   <!-- Footer Actions -->
-  <div class="menu-footer-bar app-card">
+  <div class="menu-footer-bar app-card" [class.hidden-on-mobile-empty]="getAllMenuRecipes().length === 0">
     <div class="footer-main-row flex-between" style="width: 100%; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
       <div class="footer-summary">
-        <span class="font-bold">Total :</span> {{ getNbRecettes() }} recette(s) sélectionnée(s)
+        <span class="font-bold">Total :</span> {{ getNbRecettes() }} {{ getNbRecettes() > 1 ? 'recettes sélectionnées' : 'recette sélectionnée' }}
       </div>
-      <p-button icon="pi pi-check" label="Valider le menu" class="p-button-lg" (click)="calculerCourses()"></p-button>
+      <div class="footer-actions flex-center gap-xs">
+        <button *ngIf="getAllMenuRecipes().length > 0" 
+                pButton 
+                type="button" 
+                icon="pi pi-list" 
+                label="Voir le menu" 
+                size="small" 
+                class="mobile-only btn-voir-menu" 
+                (click)="menuRecapDialog = true">
+        </button>
+        <p-button icon="pi pi-check" label="Valider le menu" class="p-button-lg" [disabled]="getAllMenuRecipes().length === 0" (click)="calculerCourses()"></p-button>
+      </div>
     </div>
 
-    <!-- Récapitulatif des recettes sélectionnées au menu -->
-    <div *ngIf="getAllMenuRecipes().length > 0" class="footer-recap-section">
-      <div class="flex-between" style="margin-bottom: 0.35rem;">
-        <span class="font-bold text-xs text-muted">Recettes choisies :</span>
+    <!-- Récapitulatif des recettes sélectionnées au menu (Desktop uniquement) -->
+    <div *ngIf="getAllMenuRecipes().length > 0" class="footer-recap-section desktop-only">
+      <div style="display: flex; justify-content: flex-end; margin-bottom: 0.4rem;">
         <button pButton type="button" icon="pi pi-trash" label="Tout vider" [text]="true" severity="danger" size="small" (click)="viderMenu()" style="padding: 0; font-size: 0.75rem;"></button>
       </div>
-      <div class="footer-recap-chips flex-wrap gap-xs">
-        <span *ngFor="let r of getAllMenuRecipes()" class="tag-badge tag-badge-removable" (click)="toggleRecipeInMenu(r)" pTooltip="Cliquer pour retirer">
-          {{ r.titre }} <i class="pi pi-times remove-tag-icon"></i>
-        </span>
+      <div class="footer-recipes-desktop-list">
+        <div *ngFor="let r of getAllMenuRecipes()" class="tag-recipe-row flex-between footer-recipe-desktop-item">
+          <div class="tag-recipe-title-area flex-center gap-xs">
+            <span class="recipe-name-text font-bold text-sm" [pTooltip]="r.titre">{{ r.titre }}</span>
+            <button *ngIf="r.instructions" pButton type="button" icon="pi pi-align-left" [text]="true" size="small" (click)="viewInstructions(r)" class="mini-icon-btn" pTooltip="Instructions"></button>
+          </div>
+          <button pButton type="button" icon="pi pi-times" severity="danger" [text]="true" size="small" (click)="toggleRecipeInMenu(r)" pTooltip="Retirer"></button>
+        </div>
       </div>
     </div>
   </div>
+
+  <!-- Modal Récapitulatif Recettes au menu (Mobile uniquement) -->
+  <p-dialog [(visible)]="menuRecapDialog" 
+            [modal]="true" 
+            [draggable]="false" 
+            [resizable]="false"
+            header="Recettes au menu ({{ getAllMenuRecipes().length }})" 
+            [style]="{width: '92vw', maxWidth: '480px'}">
+    <div class="flex-column gap-sm">
+      <div class="flex-end" *ngIf="getAllMenuRecipes().length > 0" style="display: flex; justify-content: flex-end;">
+        <button pButton type="button" label="Tout vider" icon="pi pi-trash" severity="danger" [text]="true" size="small" (click)="viderMenu()" style="font-size: 0.75rem; padding: 0.15rem 0.4rem;"></button>
+      </div>
+      <div *ngIf="getAllMenuRecipes().length > 0" class="flex-column gap-xs" style="max-height: 50vh; overflow-y: auto;">
+        <div *ngFor="let r of getAllMenuRecipes()" class="tag-recipe-row flex-between" style="padding: 0.5rem; background: var(--bg-color); border-radius: var(--radius-sm);">
+          <div class="flex-center gap-xs">
+            <span class="font-bold text-sm">{{ r.titre }}</span>
+            <button *ngIf="r.instructions" pButton type="button" icon="pi pi-align-left" [text]="true" size="small" (click)="viewInstructions(r)" class="mini-icon-btn"></button>
+          </div>
+          <button pButton type="button" icon="pi pi-times" severity="danger" [text]="true" size="small" (click)="toggleRecipeInMenu(r)" pTooltip="Retirer"></button>
+        </div>
+      </div>
+      <div *ngIf="getAllMenuRecipes().length === 0" style="text-align: center; padding: 1.5rem 0; color: var(--text-muted);">
+        Aucune recette sélectionnée.
+      </div>
+    </div>
+    <ng-template pTemplate="footer">
+      <div class="flex-between" style="width: 100%; display: flex; justify-content: space-between;">
+        <p-button label="Fermer" icon="pi pi-times" [text]="true" (click)="menuRecapDialog = false"></p-button>
+        <p-button label="Valider le menu" icon="pi pi-check" [disabled]="getAllMenuRecipes().length === 0" (click)="menuRecapDialog = false; calculerCourses()"></p-button>
+      </div>
+    </ng-template>
+  </p-dialog>
 
   <!-- View Instructions Dialog -->
   <p-dialog [(visible)]="instructionsDialog" [header]="recipeForInstructions?.titre" [modal]="true" [style]="{width: '90vw', maxWidth: '550px'}" [draggable]="false" [resizable]="false">

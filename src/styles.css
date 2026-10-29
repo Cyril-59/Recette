@@ -6,7 +6,7 @@
   --primary: #10b981;
   --primary-dark: #059669;
   --primary-light: #ecfdf5;
-  --primary-text: #065f46;
+  --primary-text: var(--primary-dark);
   
   --bg-color: #f8fafc;
   --surface-color: #ffffff;
@@ -212,53 +212,60 @@ body {
   font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
+  outline: none;
 }
 
-.tag-chip-filter:hover {
-  background-color: var(--primary-light);
-  border-color: var(--primary);
-  color: var(--primary-dark);
+.tag-chip-filter:not(.active):hover,
+.tag-chip-filter:not(.active):focus {
+  background-color: #f1f5f9;
+  border-color: #cbd5e1;
+  color: var(--text-color);
+  outline: none;
 }
 
 .tag-chip-filter.active {
-  background-color: var(--primary);
-  border-color: var(--primary-dark);
-  color: white;
+  background-color: var(--primary-light) !important;
+  border: 1px solid var(--primary-dark) !important;
+  color: var(--primary-dark) !important;
+  font-weight: 700 !important;
+  box-shadow: 0 1px 3px rgba(16, 185, 129, 0.2) !important;
+  outline: none !important;
+}
+
+.tag-chip-filter.active:hover,
+.tag-chip-filter.active:focus {
+  outline: none !important;
 }
 
 /* Season-specific Active Chips */
-.chip-season-saison.active {
-  background-color: #bbf7d0 !important;
-  color: #14532d !important;
-  border-color: #4ade80 !important;
+.chip-season-printemps.active,
+.chip-season-printemps.active:hover,
+.chip-season-printemps.active:focus {
+  background-color: var(--primary-light) !important;
+  color: var(--primary-dark) !important;
+  border-color: var(--primary) !important;
 }
 
-.chip-season-hors.active {
-  background-color: #e2e8f0 !important;
-  color: #1e293b !important;
-  border-color: #94a3b8 !important;
-}
-
-.chip-season-printemps.active {
-  background-color: #bbf7d0 !important;
-  color: #14532d !important;
-  border-color: #4ade80 !important;
-}
-
-.chip-season-ete.active {
+.chip-season-ete.active,
+.chip-season-ete.active:hover,
+.chip-season-ete.active:focus {
   background-color: #fef08a !important;
   color: #713f12 !important;
   border-color: #facc15 !important;
 }
 
-.chip-season-automne.active {
+.chip-season-automne.active,
+.chip-season-automne.active:hover,
+.chip-season-automne.active:focus {
   background-color: #fed7aa !important;
   color: #7c2d12 !important;
   border-color: #fb923c !important;
 }
 
-.chip-season-hiver.active {
+.chip-season-hiver.active,
+.chip-season-hiver.active:hover,
+.chip-season-hiver.active:focus {
   background-color: #bae6fd !important;
   color: #0c4a6e !important;
   border-color: #38bdf8 !important;
@@ -343,31 +350,31 @@ body {
 
 /* Toast Success matching Theme Emerald Green */
 .p-toast-message-success {
-  background-color: var(--primary) !important;
-  border: 1px solid var(--primary-dark) !important;
-  color: #ffffff !important;
-  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35) !important;
+  background-color: var(--primary-light) !important;
+  border: 1px solid var(--primary) !important;
+  color: var(--primary-dark) !important;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.2) !important;
 }
 
 .p-toast-message-success .p-toast-message-icon {
-  color: #ffffff !important;
+  color: var(--primary-dark) !important;
 }
 
 .p-toast-message-success .p-toast-summary {
-  color: #ffffff !important;
+  color: var(--primary-dark) !important;
   font-weight: 700 !important;
 }
 
 .p-toast-message-success .p-toast-detail {
-  color: #ffffff !important;
+  color: var(--primary-dark) !important;
 }
 
 .p-toast-message-success .p-toast-close-button {
-  color: #ffffff !important;
+  color: var(--primary-dark) !important;
 }
 
 .p-toast-message-success .p-toast-close-button:hover {
-  background: rgba(255, 255, 255, 0.2) !important;
+  background: rgba(16, 185, 129, 0.15) !important;
 }
 
 /* Tag Favori Badge */
@@ -375,4 +382,23 @@ body {
   background-color: #fef9c3 !important;
   color: #854d0e !important;
   border-color: #fde047 !important;
+}
+
+/* Page Title in primary-dark */
+.page-title {
+  color: var(--primary-dark) !important;
+}
+
+/* Outlined buttons (e.g. Ajouter) using primary-dark */
+.p-button.p-button-outlined,
+.p-button[outlined] {
+  color: var(--primary-dark) !important;
+  border-color: var(--primary-dark) !important;
+}
+
+.p-button.p-button-outlined:hover,
+.p-button[outlined]:hover {
+  background-color: var(--primary-light) !important;
+  color: var(--primary-dark) !important;
+  border-color: var(--primary-dark) !important;
 }

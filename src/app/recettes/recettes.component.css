@@ -1,23 +1,18 @@
 .page-container {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
 }
 
 .page-header {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0;
 }
 
 .page-title {
   font-size: 1.75rem;
   font-weight: 700;
   color: var(--text-color);
-}
-
-.page-subtitle {
-  color: var(--text-muted);
-  font-size: 0.95rem;
-  margin-top: 0.25rem;
+  margin: 0;
 }
 
 /* Filters Card */
@@ -69,7 +64,7 @@
   margin-right: 0.25rem;
 }
 
-.badge-spring { background: #dcfce7; color: #166534; }
+.badge-spring { background: var(--primary-light); color: var(--primary-dark); }
 .badge-summer { background: #fef08a; color: #854d0e; }
 .badge-autumn { background: #ffedd5; color: #9a3412; }
 .badge-winter { background: #e0f2fe; color: #075985; }
@@ -96,9 +91,9 @@
 }
 
 .tag-vege {
-  background-color: #ecfdf5;
-  color: #065f46;
-  border-color: #a7f3d0;
+  background-color: var(--primary-light);
+  color: var(--primary-dark);
+  border-color: rgba(16, 185, 129, 0.3);
 }
 
 .tag-express {
@@ -149,16 +144,26 @@
   transition: all 0.2s ease;
 }
 
-.tag-toggle-btn:hover {
-  background: var(--primary-light);
-  border-color: var(--primary);
-  color: var(--primary-dark);
+.tag-toggle-btn:not(.active):hover,
+.tag-toggle-btn:not(.active):focus {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: var(--text-color);
+  outline: none;
 }
 
 .tag-toggle-btn.active {
-  background: var(--primary);
-  border-color: var(--primary-dark);
-  color: white;
+  background: var(--primary-light) !important;
+  border: 1px solid var(--primary-dark) !important;
+  color: var(--primary-dark) !important;
+  font-weight: 700 !important;
+  box-shadow: 0 1px 3px rgba(16, 185, 129, 0.2) !important;
+  outline: none !important;
+}
+
+.tag-toggle-btn.active:hover,
+.tag-toggle-btn.active:focus {
+  outline: none !important;
 }
 
 .tag-badge-removable {

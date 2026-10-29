@@ -36,6 +36,7 @@ export class StocksComponent implements OnInit, OnChanges {
   selectedTag: string = null;
   instructionsDialog = false;
   recipeForInstructions: Recette = null;
+  menuRecapDialog = false;
 
   mois: string[] = []
   hiver = [1, 2, 3, 12]
@@ -353,6 +354,9 @@ export class StocksComponent implements OnInit, OnChanges {
 
   calculerCourses() {
     const selectedRecettes: Recette[] = this.getAllMenuRecipes();
+    if (!selectedRecettes || selectedRecettes.length === 0) {
+      return;
+    }
 
     const map = new Map<string, number>();
     // On ajoute les produits des recettes sélectionnées
@@ -488,6 +492,10 @@ export class StocksComponent implements OnInit, OnChanges {
     if (idsToSave.length > 0) {
       this.menuService.saveSelection(idsToSave, copyText, stockJson, autresJson).subscribe();
     }
+
+    this.selectedMenuRecipes = [];
+    this.selectedRecipes = [];
+    this.menuRecapDialog = false;
   }
 
   goToUrl(url) {
