@@ -98,12 +98,36 @@
             [draggable]="false" 
             [resizable]="false">
     
-    <!-- Vue 1 : Liste des recettes sélectionnées -->
-    <div *ngIf="!selectedRecipeDetail" class="menu-preview-container">
-      <div *ngIf="recettesCourses && recettesCourses.length > 0; else noRecipesTpl" class="planned-recipes-list flex-column gap-sm">
-        <p class="preview-subtitle">Cliquez sur une recette pour afficher ses étapes de préparation :</p>
+    <!-- Vue 1 : Liste des recettes sélectionnées avec bascule historique -->
+    <div *ngIf="!selectedRecipeDetail" class="menu-preview-container flex-column gap-md">
+      
+      <!-- Boutons de bascule (Menu actuel / Semaine précédente) -->
+      <div class="history-toggle-bar flex-center gap-xs" *ngIf="menuHistory && menuHistory.length > 0">
+        <button type="button" 
+                class="history-toggle-btn" 
+                [class.active]="activeHistoryIndex === 0" 
+                (click)="activeHistoryIndex = 0; selectedRecipeDetail = null">
+          <i class="pi pi-calendar"></i>
+          <span>Menu actuel</span>
+          <span class="count-pill" *ngIf="menuHistory[0]">{{ menuHistory[0].recettes?.length || 0 }}</span>
+        </button>
+        <button type="button" 
+                class="history-toggle-btn" 
+                [class.active]="activeHistoryIndex === 1" 
+                (click)="activeHistoryIndex = 1; selectedRecipeDetail = null"
+                [disabled]="!menuHistory[1]">
+          <i class="pi pi-history"></i>
+          <span>Semaine précédente</span>
+          <span class="count-pill" *ngIf="menuHistory[1]">{{ menuHistory[1].recettes?.length || 0 }}</span>
+        </button>
+      </div>
+
+      <div *ngIf="getActiveRecipes().length > 0; else noRecipesTpl" class="planned-recipes-list flex-column gap-sm">
+        <p class="preview-subtitle">
+          {{ activeHistoryIndex === 0 ? 'Recettes prévues pour cette semaine :' : 'Recettes cuisinées la semaine précédente :' }}
+        </p>
         
-        <div *ngFor="let r of recettesCourses" class="planned-recipe-item flex-between" (click)="selectRecipeDetail(r)">
+        <div *ngFor="let r of getActiveRecipes()" class="planned-recipe-item flex-between" (click)="selectRecipeDetail(r)">
           <div class="recipe-item-left">
             <h4 class="recipe-item-title">{{ r.titre }}</h4>
             <div class="tags-container" *ngIf="r.tags && r.tags.length > 0" style="margin-bottom: 0.25rem;">
@@ -125,8 +149,10 @@
       <ng-template #noRecipesTpl>
         <div class="empty-menu-box flex-column flex-center gap-md">
           <i class="pi pi-info-circle empty-icon"></i>
-          <p class="empty-text">Aucune recette n'est actuellement prévue au menu.</p>
-          <button pButton label="Composer mon menu" icon="pi pi-home" size="small" (click)="index = 0; showMenuPreview = false"></button>
+          <p class="empty-text">
+            {{ activeHistoryIndex === 0 ? "Aucune recette n'est actuellement prévue au menu." : "Aucun historique disponible pour la semaine précédente." }}
+          </p>
+          <button *ngIf="activeHistoryIndex === 0" pButton label="Composer mon menu" icon="pi pi-home" size="small" (click)="index = 0; showMenuPreview = false"></button>
         </div>
       </ng-template>
     </div>

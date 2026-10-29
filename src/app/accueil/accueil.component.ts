@@ -21,22 +21,39 @@ export class AccueilComponent implements OnInit, AfterViewInit {
   showMenuPreview = false;
   selectedRecipeDetail: Recette = null;
 
+  menuHistory: { id: number; createdAt: string; recettes: Recette[] }[] = [];
+  activeHistoryIndex = 0;
+
   constructor(private menuService: MenuService) { }
 
   ngOnInit(): void {
-    this.menuService.getLatestSelection().subscribe((saved) => {
-      if (saved && saved.length > 0) {
-        const unique: Recette[] = [];
-        const seen = new Set<number>();
-        for (const r of saved) {
-          if (r && r.id && !seen.has(r.id)) {
-            seen.add(r.id);
-            unique.push(r);
-          }
-        }
-        this.recettesCourses = unique;
+    this.loadMenuHistory();
+  }
+
+  loadMenuHistory(): void {
+    this.menuService.getHistory().subscribe((history) => {
+      this.menuHistory = history || [];
+      if (this.menuHistory.length > 0 && this.menuHistory[0].recettes) {
+        this.recettesCourses = this.menuHistory[0].recettes;
+      } else {
+        this.recettesCourses = [];
       }
     });
+  }
+
+  getActiveRecipes(): Recette[] {
+    if (!this.menuHistory || this.menuHistory.length === 0) {
+      return this.recettesCourses || [];
+    }
+    const current = this.menuHistory[this.activeHistoryIndex];
+    return current && current.recettes ? current.recettes : [];
+  }
+
+  openMenuPreview() {
+    this.selectedRecipeDetail = null;
+    this.activeHistoryIndex = 0;
+    this.loadMenuHistory();
+    this.showMenuPreview = true;
   }
 
   ngAfterViewInit(): void {
@@ -46,11 +63,6 @@ export class AccueilComponent implements OnInit, AfterViewInit {
   @HostListener('window:resize', ['$event'])
   onResize(event) {
     this.innerWidth = window.innerWidth;
-  }
-
-  openMenuPreview() {
-    this.selectedRecipeDetail = null;
-    this.showMenuPreview = true;
   }
 
   selectRecipeDetail(recipe: Recette) {

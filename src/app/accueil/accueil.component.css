@@ -393,3 +393,59 @@
   font-size: 0.8rem;
   margin-top: 0.25rem;
 }
+
+/* History Toggle Bar in Preview Dialog */
+.history-toggle-bar {
+  display: flex;
+  background-color: var(--bg-color);
+  padding: 0.25rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  width: 100%;
+}
+
+.history-toggle-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.6rem;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.history-toggle-btn:hover:not(:disabled) {
+  color: var(--text-color);
+}
+
+.history-toggle-btn.active {
+  background: white;
+  color: var(--primary-dark);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.history-toggle-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.count-pill {
+  background-color: #f1f5f9;
+  color: #475569;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.1rem 0.4rem;
+  border-radius: var(--radius-full);
+}
+
+.history-toggle-btn.active .count-pill {
+  background-color: var(--primary-light);
+  color: var(--primary-dark);
+}

@@ -18,6 +18,10 @@ export class MenuService {
     return this.http.get<Recette[]>(this.apiUrl);
   }
 
+  getHistory(): Observable<{ id: number; createdAt: string; recettes: Recette[] }[]> {
+    return this.http.get<{ id: number; createdAt: string; recettes: Recette[] }[]>(`${this.apiUrl}/history`);
+  }
+
   saveSelection(recetteIds: number[]): Observable<Recette[]> {
     return this.http.post<Recette[]>(this.apiUrl, { recetteIds });
   }
