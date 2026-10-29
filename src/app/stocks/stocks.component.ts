@@ -20,14 +20,19 @@ export class StocksComponent implements OnInit, OnChanges {
   autresRecettes: Recette[];
   recettesSaison: Recette[];
   selectedRecipes: Recette[];
+  selectedMenuRecipes: Recette[] = [];
   optionsRecettesMatch: SelectItem[] = [];
   options: SelectItem[] = [];
   optionsSaisons: SelectItem[];
   courses: Map<string, Ingredient[]>;
   coursesText: string;
 
-  availableTags: string[] = ['Végétarien', 'Express', 'Batch cooking'];
-  allTags: string[] = ['Végétarien', 'Express', 'Batch cooking'];
+  seasonFilter: 'saison' | 'hors-saison' | null = 'saison';
+  selectedFilterTags: Set<string> = new Set<string>();
+  recipeSearchQuery: string = '';
+
+  availableTags: string[] = ['Favori', 'Végé', 'Express', 'Batch cooking'];
+  allTags: string[] = ['Favori', 'Végé', 'Express', 'Batch cooking'];
   selectedTag: string = null;
   instructionsDialog = false;
   recipeForInstructions: Recette = null;
@@ -37,7 +42,7 @@ export class StocksComponent implements OnInit, OnChanges {
   printemps = [3, 4, 5, 6]
   ete = [6, 7, 8 , 9]
   automne = [9, 10, 11, 12]
-  @Output() onCourses = new EventEmitter<string>();
+  @Output() onCourses = new EventEmitter<any>();
 
   constructor(public messageService: MessageService, private menuService: MenuService) { }
 
@@ -69,6 +74,7 @@ export class StocksComponent implements OnInit, OnChanges {
   }
 
   initRecette() {
+    this.selectedMenuRecipes = [];
     this.initRecetteSaison();
     this.initAutreRecette();
   }
@@ -115,12 +121,63 @@ export class StocksComponent implements OnInit, OnChanges {
     this.allTags = Array.from(set);
   }
 
-  selectTag(tag: string) {
-    if (this.selectedTag === tag) {
-      this.selectedTag = null;
+  isRecipeDeSaison(r: Recette): boolean {
+    if (!r) return false;
+    return !!((r.automne && this.mois.includes('automne')) ||
+              (r.ete && this.mois.includes('ete')) ||
+              (r.hiver && this.mois.includes('hiver')) ||
+              (r.printemps && this.mois.includes('printemps')));
+  }
+
+  setSeasonFilter(filter: 'saison' | 'hors-saison'): void {
+    if (this.seasonFilter === filter) {
+      this.seasonFilter = null;
     } else {
-      this.selectedTag = tag;
+      this.seasonFilter = filter;
     }
+  }
+
+  toggleFilterTag(tag: string): void {
+    if (this.selectedFilterTags.has(tag)) {
+      this.selectedFilterTags.delete(tag);
+    } else {
+      this.selectedFilterTags.add(tag);
+    }
+  }
+
+  isFilterTagActive(tag: string): boolean {
+    return this.selectedFilterTags.has(tag);
+  }
+
+  getMatchingRecipes(): Recette[] {
+    if (!this.recettes) return [];
+    return this.recettes.filter(r => {
+      // 1. Filtre de saisonnalité exclusif (si activé)
+      if (this.seasonFilter) {
+        const deSaison = this.isRecipeDeSaison(r);
+        if (this.seasonFilter === 'saison' && !deSaison) return false;
+        if (this.seasonFilter === 'hors-saison' && deSaison) return false;
+      }
+
+      // 2. Filtres par tags (ET logique : doit posséder TOUS les tags sélectionnés)
+      if (this.selectedFilterTags.size > 0) {
+        for (const t of this.selectedFilterTags) {
+          if (!r.tags || !r.tags.includes(t)) {
+            return false;
+          }
+        }
+      }
+
+      // 3. Recherche textuelle
+      if (this.recipeSearchQuery && this.recipeSearchQuery.trim()) {
+        const q = this.recipeSearchQuery.toLowerCase().trim();
+        const matchTitre = r.titre && r.titre.toLowerCase().includes(q);
+        const matchIng = r.stringIngredients && r.stringIngredients.toLowerCase().includes(q);
+        if (!matchTitre && !matchIng) return false;
+      }
+
+      return true;
+    });
   }
 
   getAllMenuRecipes(): Recette[] {
@@ -137,6 +194,7 @@ export class StocksComponent implements OnInit, OnChanges {
         }
       }
     };
+    addAll(this.selectedMenuRecipes);
     addAll(this.recettesSaison);
     addAll(this.autresRecettes);
     addAll(this.selectedRecipes);
@@ -184,47 +242,32 @@ export class StocksComponent implements OnInit, OnChanges {
 
   isRecipeInMenu(recipe: Recette): boolean {
     if (!recipe || !recipe.id) return false;
-    const inSaison = this.recettesSaison?.some(r => r.id === recipe.id);
-    const inAutres = this.autresRecettes?.some(r => r.id === recipe.id);
+    const inSelectedMenu = this.selectedMenuRecipes?.some(r => r.id === recipe.id);
     const inSelected = this.selectedRecipes?.some(r => r.id === recipe.id);
-    return !!(inSaison || inAutres || inSelected);
+    return !!(inSelectedMenu || inSelected);
   }
 
   toggleRecipeInMenu(recipe: Recette) {
+    if (!recipe || !recipe.id) return;
     if (this.isRecipeInMenu(recipe)) {
-      if (this.recettesSaison) {
-        const idx = this.recettesSaison.findIndex(r => r.id === recipe.id);
-        if (idx > -1) this.recettesSaison.splice(idx, 1);
-      }
-      if (this.autresRecettes) {
-        const idx = this.autresRecettes.findIndex(r => r.id === recipe.id);
-        if (idx > -1) this.autresRecettes.splice(idx, 1);
+      const idx = this.selectedMenuRecipes.findIndex(r => r.id === recipe.id);
+      if (idx > -1) {
+        this.selectedMenuRecipes.splice(idx, 1);
       }
       if (this.selectedRecipes) {
-        const idx = this.selectedRecipes.findIndex(r => r.id === recipe.id);
-        if (idx > -1) this.selectedRecipes.splice(idx, 1);
+        const idxStock = this.selectedRecipes.findIndex(r => r.id === recipe.id);
+        if (idxStock > -1) this.selectedRecipes.splice(idxStock, 1);
       }
       this.messageService.add({severity:'info', summary:'Retirée du menu', detail: recipe.titre});
     } else {
-      const isSaison = recipe.automne && this.mois.includes('automne') ||
-                       recipe.ete && this.mois.includes('ete') ||
-                       recipe.hiver && this.mois.includes('hiver') ||
-                       recipe.printemps && this.mois.includes('printemps');
-      if (isSaison) {
-        if (this.recettesSaison.length === 1 && !this.recettesSaison[0].titre) {
-          this.recettesSaison = [recipe];
-        } else {
-          this.recettesSaison.push(recipe);
-        }
-      } else {
-        if (this.autresRecettes.length === 1 && !this.autresRecettes[0].titre) {
-          this.autresRecettes = [recipe];
-        } else {
-          this.autresRecettes.push(recipe);
-        }
-      }
+      this.selectedMenuRecipes.push(recipe);
       this.messageService.add({severity:'success', summary:'Ajoutée au menu', detail: recipe.titre});
     }
+  }
+
+  viderMenu(): void {
+    this.selectedMenuRecipes = [];
+    this.selectedRecipes = [];
   }
 
   viewInstructions(recipe: Recette) {
@@ -366,35 +409,37 @@ export class StocksComponent implements OnInit, OnChanges {
     });
     this.courses = courses;
 
-    let copy = '<p>Recettes<br/>';
+    let copy = '<p><strong><u>Recettes</u></strong><br/>';
     for (const recipe of selectedRecettes) {
       if (recipe.titre) {
-        copy += '-&nbsp;&nbsp;' + recipe.titre;
+        copy += '•&nbsp;&nbsp;' + recipe.titre;
         let first = true;
-        for (const ing of recipe.ingredients) {
-          if (ing.produit.type == 'légume') {
-            if (first) {
-              copy += ' (';
-            }
-            if (!first) {
-              copy += ', ';
-            }
-            copy += ing.quantite;
-            if (ing.produit.unite != 'pièce(s)') {
-              if (ing.produit.unite == 'grammes') {
-                copy += 'g';
+        if (recipe.ingredients && recipe.ingredients.length > 0) {
+          for (const ing of recipe.ingredients) {
+            if (ing.produit) {
+              if (first) {
+                copy += ' (';
               } else {
-                copy += ing.produit.unite;
+                copy += ', ';
               }
-            }
-            copy += ' ' + ing.produit.label;
-            if (first) {
+              if (ing.quantite) {
+                copy += ing.quantite;
+                if (ing.produit.unite && ing.produit.unite !== 'pièce(s)') {
+                  if (ing.produit.unite === 'grammes') {
+                    copy += 'g';
+                  } else {
+                    copy += ing.produit.unite;
+                  }
+                }
+                copy += ' ';
+              }
+              copy += ing.produit.label;
               first = false;
             }
           }
-        }
-        if (!first) {
-          copy += ')';
+          if (!first) {
+            copy += ')';
+          }
         }
         copy += '<br/>';
       }
@@ -407,20 +452,41 @@ export class StocksComponent implements OnInit, OnChanges {
       } else {
         copy += '<br/>';
       }
-      copy += key.charAt(0).toUpperCase() + key.slice(1) + '<br/>';
+      copy += '<strong><u>' + key.charAt(0).toUpperCase() + key.slice(1) + '</u></strong><br/>';
       for (const ingredient of value) {
-          copy += '-&nbsp;&nbsp;' + ingredient.produit.label + ' - ' + ingredient.quantite + ' ' + ingredient.produit.unite + '<br/>';
+          copy += '•&nbsp;&nbsp;' + ingredient.produit.label + ' - ' + ingredient.quantite + ' ' + ingredient.produit.unite + '<br/>';
       }
     });
 
-    this.onCourses.emit(copy + '</p>');
+    const validStock = this.ingredients
+      ? this.ingredients.filter(i => !!i.produit && !!i.quantite)
+      : [];
+    const validAutres = this.ingredientsAutres
+      ? this.ingredientsAutres.filter(i => !!i.produit && !!i.quantite)
+      : [];
+
+    const copyText = copy + '</p>';
+    const stockJson = JSON.stringify(validStock);
+    const autresJson = JSON.stringify(validAutres);
+
+    try {
+      localStorage.setItem('recette_courses_text', copyText);
+      localStorage.setItem('recette_courses_stock', stockJson);
+      localStorage.setItem('recette_courses_autres', autresJson);
+    } catch (e) {}
+
+    this.onCourses.emit({
+      text: copyText,
+      stock: validStock,
+      autres: validAutres
+    });
 
     this.recettesCourses.length = 0;
     this.recettesCourses.push(...selectedRecettes);
 
     const idsToSave = Array.from(new Set(selectedRecettes.filter(r => !!r.id).map(r => r.id)));
     if (idsToSave.length > 0) {
-      this.menuService.saveSelection(idsToSave).subscribe();
+      this.menuService.saveSelection(idsToSave, copyText, stockJson, autresJson).subscribe();
     }
   }
 

@@ -7,18 +7,44 @@
     <img class="header-icon desktop-only" src="/assets/basket.png" alt="Panier"/>
   </div>
 
-  <!-- Summary of selected recipes for these groceries -->
-  <div *ngIf="recettes && recettes.length > 0" class="app-card recipes-summary-card">
-    <h3 class="section-title"><i class="pi pi-book section-icon"></i> Recettes prévues ({{ recettes.length }})</h3>
-    <div class="recipes-chip-list">
-      <span *ngFor="let r of recettes" class="recipe-chip">
-        <i class="pi pi-check chip-icon"></i> {{ r.titre }}
-      </span>
+  <!-- Summary of selected recipes, stock deductions and extra needs for these groceries -->
+  <div *ngIf="(recettes && recettes.length > 0) || (stockIngredients && stockIngredients.length > 0) || (autresIngredients && autresIngredients.length > 0)" class="app-card recipes-summary-card">
+    <div *ngIf="recettes && recettes.length > 0">
+      <h3 class="section-title"><i class="pi pi-book section-icon"></i> Recettes prévues ({{ recettes.length }})</h3>
+      <div class="recipes-chip-list">
+        <span *ngFor="let r of recettes" class="recipe-chip" [pTooltip]="r.tooltipIngredients || r.stringIngredients">
+          <i class="pi pi-check chip-icon"></i> {{ r.titre }}
+        </span>
+      </div>
+    </div>
+
+    <!-- En stock (déduit des courses) -->
+    <div *ngIf="stockIngredients && stockIngredients.length > 0" class="summary-sub-section" style="margin-top: 0.75rem; padding-top: 0.6rem; border-top: 1px solid var(--border-color);">
+      <h4 class="summary-sub-title text-xs font-bold" style="color: #15803d; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.35rem;">
+        <i class="pi pi-box"></i> En stock <span class="card-subtitle-hint">(déduit des courses)</span> :
+      </h4>
+      <div class="flex-wrap gap-xs">
+        <span *ngFor="let ing of stockIngredients" class="tag-badge" style="background-color: #ecfdf5; color: #065f46; border-color: #a7f3d0;">
+          <i class="pi pi-minus" style="font-size: 0.65rem;"></i> {{ ing.quantite }} {{ ing.produit?.unite }} {{ ing.produit?.label }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Autres besoins (ajouté aux courses) -->
+    <div *ngIf="autresIngredients && autresIngredients.length > 0" class="summary-sub-section" style="margin-top: 0.6rem; padding-top: 0.5rem; border-top: 1px solid var(--border-color);">
+      <h4 class="summary-sub-title text-xs font-bold" style="color: #0369a1; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.35rem;">
+        <i class="pi pi-shopping-bag"></i> Autres besoins <span class="card-subtitle-hint">(ajouté aux courses)</span> :
+      </h4>
+      <div class="flex-wrap gap-xs">
+        <span *ngFor="let ing of autresIngredients" class="tag-badge" style="background-color: #f0f9ff; color: #0369a1; border-color: #bae6fd;">
+          <i class="pi pi-plus" style="font-size: 0.65rem;"></i> {{ ing.quantite }} {{ ing.produit?.unite }} {{ ing.produit?.label }}
+        </span>
+      </div>
     </div>
   </div>
 
   <div class="app-card editor-card">
-    <p-editor #editor [(ngModel)]="text" [style]="{'height':'400px'}"></p-editor>
+    <p-editor #editor [(ngModel)]="text" (ngModelChange)="onTextChange($event)" [style]="{'height':'400px'}"></p-editor>
   </div>
 
   <div class="app-card actions-card flex-between">

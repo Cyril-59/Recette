@@ -4,6 +4,15 @@ import { Recette } from '../model/recette';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
+export interface MenuSelectionHistoryItem {
+  id: number;
+  createdAt: string;
+  coursesText?: string;
+  stockJson?: string;
+  autresJson?: string;
+  recettes: Recette[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -18,12 +27,12 @@ export class MenuService {
     return this.http.get<Recette[]>(this.apiUrl);
   }
 
-  getHistory(): Observable<{ id: number; createdAt: string; recettes: Recette[] }[]> {
-    return this.http.get<{ id: number; createdAt: string; recettes: Recette[] }[]>(`${this.apiUrl}/history`);
+  getHistory(): Observable<MenuSelectionHistoryItem[]> {
+    return this.http.get<MenuSelectionHistoryItem[]>(`${this.apiUrl}/history`);
   }
 
-  saveSelection(recetteIds: number[]): Observable<Recette[]> {
-    return this.http.post<Recette[]>(this.apiUrl, { recetteIds });
+  saveSelection(recetteIds: number[], coursesText?: string, stockJson?: string, autresJson?: string): Observable<Recette[]> {
+    return this.http.post<Recette[]>(this.apiUrl, { recetteIds, coursesText, stockJson, autresJson });
   }
 
   clearSelection(): Observable<void> {

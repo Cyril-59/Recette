@@ -11,7 +11,14 @@
   <div class="app-card filters-card">
     <div class="search-input-wrapper">
       <i class="pi pi-search search-icon"></i>
-      <input pInputText type="text" (input)="dt.filterGlobal($event.target.value, 'contains')" placeholder="Rechercher une recette..." class="search-input">
+      <input #searchInput pInputText type="text" (input)="dt.filterGlobal($event.target.value, 'contains')" placeholder="Rechercher une recette..." class="search-input">
+      <button *ngIf="searchInput.value && searchInput.value.length > 0"
+              type="button"
+              class="clear-search-btn"
+              (click)="searchInput.value = ''; dt.filterGlobal('', 'contains')"
+              pTooltip="Effacer la recherche">
+        <i class="pi pi-times"></i>
+      </button>
     </div>
 
     <!-- Ligne 1 : Les 4 Filtres Saisons -->
@@ -67,7 +74,7 @@
               </a>
             </div>
             <div class="tags-container" *ngIf="(recipe.tags && recipe.tags.length > 0) || (recipe.linkedRecettes && recipe.linkedRecettes.length > 0)">
-              <span *ngFor="let t of recipe.tags" class="tag-badge" [ngClass]="{'tag-vege': t === 'Végétarien', 'tag-express': t.startsWith('Express')}">{{ t }}</span>
+              <span *ngFor="let t of recipe.tags" class="tag-badge" [ngClass]="{'tag-favori': t === 'Favori', 'tag-vege': t === 'Végé' || t === 'Végétarien', 'tag-express': t.startsWith('Express')}">{{ t }}</span>
               <span *ngIf="recipe.linkedRecettes && recipe.linkedRecettes.length > 0" class="tag-badge tag-anti-gaspi" pTooltip="Recettes liées anti-gaspillage">
                 <i class="pi pi-link"></i> {{ recipe.linkedRecettes.length }} liée(s)
               </span>
@@ -112,7 +119,7 @@
       </div>
 
       <div class="tags-container" *ngIf="(recipe.tags && recipe.tags.length > 0) || (recipe.linkedRecettes && recipe.linkedRecettes.length > 0)" style="margin-top: 0.25rem;">
-        <span *ngFor="let t of recipe.tags" class="tag-badge" [ngClass]="{'tag-vege': t === 'Végétarien', 'tag-express': t.startsWith('Express')}">{{ t }}</span>
+        <span *ngFor="let t of recipe.tags" class="tag-badge" [ngClass]="{'tag-favori': t === 'Favori', 'tag-vege': t === 'Végé' || t === 'Végétarien', 'tag-express': t.startsWith('Express')}">{{ t }}</span>
         <span *ngIf="recipe.linkedRecettes && recipe.linkedRecettes.length > 0" class="tag-badge tag-anti-gaspi">
           <i class="pi pi-link"></i> {{ recipe.linkedRecettes.length }} liée(s)
         </span>

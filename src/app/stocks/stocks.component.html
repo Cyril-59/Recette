@@ -9,43 +9,80 @@
 
   <!-- Sections in a responsive grid -->
   <div class="menu-grid">
-    <!-- 1. Recettes de saison -->
-    <div class="app-card section-card">
+    <!-- 1. Carte Unique : Recherche de recettes -->
+    <div class="app-card section-card unified-search-card">
       <div class="section-header flex-between">
-        <h2 class="section-title"><i class="pi pi-sun section-icon"></i> Recettes de saison</h2>
-        <span class="count-badge">{{ getNbRecettesSaison() }}</span>
+        <h2 class="section-title"><i class="pi pi-search section-icon"></i> Recherche de recettes</h2>
+        <span class="count-badge">{{ getMatchingRecipes().length }} recette(s)</span>
       </div>
-      <div class="items-list flex-column gap-sm">
-        <div *ngFor="let recetteSaison of recettesSaison; index as idx" class="item-row">
-          <p-dropdown [filter]="true" [autofocusFilter]="false" [options]="optionsSaisons" [(ngModel)]="recettesSaison[idx]" placeholder="Choisir une recette" [style]="{flex: '1'}"></p-dropdown>
-          <button pButton type="button" icon="pi pi-trash" severity="danger" [text]="true" size="small" (click)="enleverRecette(idx, 1)"></button>
+
+      <div class="unified-search-body flex-column gap-sm">
+        <!-- Recherche textuelle -->
+        <div class="search-input-wrapper">
+          <i class="pi pi-search search-icon"></i>
+          <input pInputText type="text" [(ngModel)]="recipeSearchQuery" placeholder="Rechercher par titre/ingrédient" class="search-input">
+          <button *ngIf="recipeSearchQuery && recipeSearchQuery.length > 0"
+                  type="button"
+                  class="clear-search-btn"
+                  (click)="recipeSearchQuery = ''"
+                  pTooltip="Effacer la recherche">
+            <i class="pi pi-times"></i>
+          </button>
         </div>
-      </div>
-      <div class="section-actions flex-between">
-        <p-button icon="pi pi-plus" label="Ajouter" size="small" [outlined]="true" (click)="ajouterRecette(1)"></p-button>
-        <button pButton type="button" icon="pi pi-undo" [text]="true" size="small" (click)="initRecetteSaison()" pTooltip="Réinitialiser"></button>
+
+        <!-- Filtre de Saisonnalité (exclusif : 'De saison' par défaut, ou 'Hors saison') -->
+        <div class="season-toggle-row">
+          <button type="button" 
+                  class="tag-chip-filter chip-season-saison" 
+                  [class.active]="seasonFilter === 'saison'" 
+                  (click)="setSeasonFilter('saison')">
+            De saison
+          </button>
+          <button type="button" 
+                  class="tag-chip-filter chip-season-hors" 
+                  [class.active]="seasonFilter === 'hors-saison'" 
+                  (click)="setSeasonFilter('hors-saison')">
+            Hors saison
+          </button>
+        </div>
+
+        <!-- Filtres par Tags (combinables en ET logique avec la saisonnalité) -->
+        <div class="tag-filter-chips other-chips-row" style="justify-content: center;" *ngIf="allTags && allTags.length > 0">
+          <button *ngFor="let t of allTags"
+                  type="button"
+                  class="tag-chip-filter"
+                  [class.active]="isFilterTagActive(t)"
+                  (click)="toggleFilterTag(t)">
+            {{ t }}
+          </button>
+        </div>
+
+        <!-- Liste des recettes correspondantes aux filtres combinés -->
+        <div class="matching-recipes-list flex-column gap-xs">
+          <div *ngFor="let r of getMatchingRecipes()" class="tag-recipe-row flex-between">
+            <div class="tag-recipe-title-area flex-center gap-xs">
+              <span class="font-bold recipe-name-text" [pTooltip]="r.tooltipIngredients">{{ r.titre }}</span>
+              <button *ngIf="r.instructions" pButton type="button" icon="pi pi-align-left" [text]="true" size="small" pTooltip="Instructions" (click)="viewInstructions(r)" class="mini-icon-btn"></button>
+            </div>
+            <button pButton type="button" 
+                    [icon]="isRecipeInMenu(r) ? 'pi pi-check' : 'pi pi-plus'" 
+                    [label]="isRecipeInMenu(r) ? 'Au menu' : 'Ajouter'" 
+                    class="btn-recipe-toggle"
+                    [class.in-menu]="isRecipeInMenu(r)"
+                    [class.not-in-menu]="!isRecipeInMenu(r)"
+                    size="small"
+                    (click)="toggleRecipeInMenu(r)">
+            </button>
+          </div>
+
+          <div *ngIf="getMatchingRecipes().length === 0" class="no-tag-match">
+            <p>Aucune recette ne correspond aux filtres sélectionnés.</p>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- 2. Autres recettes -->
-    <div class="app-card section-card">
-      <div class="section-header flex-between">
-        <h2 class="section-title"><i class="pi pi-book section-icon"></i> Autres recettes</h2>
-        <span class="count-badge">{{ getNbAutresRecettes() }}</span>
-      </div>
-      <div class="items-list flex-column gap-sm">
-        <div *ngFor="let autreRecette of autresRecettes; index as idx" class="item-row">
-          <p-dropdown [filter]="true" [autofocusFilter]="false" [options]="options" [(ngModel)]="autresRecettes[idx]" placeholder="Choisir une recette" [style]="{flex: '1'}"></p-dropdown>
-          <button pButton type="button" icon="pi pi-trash" severity="danger" [text]="true" size="small" (click)="enleverRecette(idx, 2)"></button>
-        </div>
-      </div>
-      <div class="section-actions flex-between">
-        <p-button icon="pi pi-plus" label="Ajouter" size="small" [outlined]="true" (click)="ajouterRecette(2)"></p-button>
-        <button pButton type="button" icon="pi pi-undo" [text]="true" size="small" (click)="initAutreRecette()" pTooltip="Réinitialiser"></button>
-      </div>
-    </div>
-
-    <!-- 3. Suggestions Anti-Gaspillage (placée immédiatement après Autres recettes) -->
+    <!-- 2. Suggestions Anti-Gaspillage (placée immédiatement après la recherche) -->
     <div *ngIf="getAntiGaspiSuggestions().length > 0" class="app-card section-card anti-gaspi-card">
       <div class="section-header flex-between">
         <div class="flex-center gap-xs">
@@ -68,71 +105,29 @@
                 <i class="pi pi-link"></i> Liée à <em>{{ sug.sourceRecipe.titre }}</em>
               </div>
             </div>
-            <button pButton type="button" icon="pi pi-plus" label="Ajouter" size="small" (click)="toggleRecipeInMenu(sug.suggestedRecipe)"></button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 4. Recherche par tags -->
-    <div class="app-card section-card tag-search-card">
-      <div class="section-header flex-between">
-        <h2 class="section-title"><i class="pi pi-tags section-icon"></i> Recherche par tags</h2>
-        <span class="count-badge" *ngIf="selectedTag">{{ getMatchingRecipesByTag().length }}</span>
-      </div>
-
-      <div class="tag-search-body flex-column gap-sm">
-        <!-- Tag selector pills -->
-        <div class="tag-pills-wrap">
-          <button *ngFor="let t of allTags"
-                  type="button"
-                  class="tag-filter-pill"
-                  [class.active]="selectedTag === t"
-                  (click)="selectTag(t)">
-            {{ t }}
-          </button>
-        </div>
-
-        <!-- Matching recipes list -->
-        <div *ngIf="selectedTag; else selectTagPrompt" class="matching-recipes-list flex-column gap-xs">
-          <div *ngFor="let r of getMatchingRecipesByTag()" class="tag-recipe-row flex-between">
-            <div class="tag-recipe-title-area flex-center gap-xs">
-              <span class="font-bold recipe-name-text">{{ r.titre }}</span>
-              <button *ngIf="r.instructions" pButton type="button" icon="pi pi-align-left" [text]="true" size="small" pTooltip="Instructions" (click)="viewInstructions(r)" class="mini-icon-btn"></button>
-            </div>
             <button pButton type="button" 
-                    [icon]="isRecipeInMenu(r) ? 'pi pi-check' : 'pi pi-plus'" 
-                    [label]="isRecipeInMenu(r) ? 'Au menu' : 'Ajouter'" 
-                    [severity]="isRecipeInMenu(r) ? 'success' : 'primary'"
-                    [text]="isRecipeInMenu(r)"
-                    size="small"
-                    (click)="toggleRecipeInMenu(r)">
+                    [icon]="isRecipeInMenu(sug.suggestedRecipe) ? 'pi pi-check' : 'pi pi-plus'" 
+                    [label]="isRecipeInMenu(sug.suggestedRecipe) ? 'Au menu' : 'Ajouter'" 
+                    class="btn-recipe-toggle"
+                    [class.in-menu]="isRecipeInMenu(sug.suggestedRecipe)"
+                    [class.not-in-menu]="!isRecipeInMenu(sug.suggestedRecipe)"
+                    size="small" 
+                    (click)="toggleRecipeInMenu(sug.suggestedRecipe)">
             </button>
           </div>
-
-          <div *ngIf="getMatchingRecipesByTag().length === 0" class="no-tag-match">
-            <p>Aucune recette trouvée avec le tag "{{ selectedTag }}".</p>
-          </div>
         </div>
-
-        <ng-template #selectTagPrompt>
-          <div class="select-tag-prompt flex-column flex-center">
-            <i class="pi pi-search prompt-icon"></i>
-            <p class="prompt-text">Sélectionnez un tag pour afficher et ajouter des recettes adaptées.</p>
-          </div>
-        </ng-template>
       </div>
     </div>
 
-    <!-- 5. Ce que j'ai en stock (avec les recettes proposées affichées directement sous la carte) -->
+    <!-- 3. Ce que j'ai en stock (avec les recettes proposées affichées directement sous la carte) -->
     <div class="app-card section-card">
       <div class="section-header flex-between">
-        <h2 class="section-title"><i class="pi pi-box section-icon"></i> En stock</h2>
+        <h2 class="section-title"><i class="pi pi-box section-icon"></i> En stock <span class="card-subtitle-hint">(déduit des courses)</span></h2>
         <span class="count-badge">{{ ingredients.length }}</span>
       </div>
       <div class="items-list flex-column gap-sm">
         <div *ngFor="let ingredient of ingredients; index as idx" class="item-row">
-          <p-dropdown [filter]="true" [autofocusFilter]="false" [options]="produits" [(ngModel)]="ingredient.produit" placeholder="Produit" [style]="{flex: '1'}"></p-dropdown>
+          <p-dropdown [filter]="true" [autofocusFilter]="false" appendTo="body" [options]="produits" [(ngModel)]="ingredient.produit" placeholder="Produit" [style]="{flex: '1'}"></p-dropdown>
           <input type="number" pInputText [(ngModel)]="ingredient.quantite" placeholder="Qtt" style="width: 60px;">
           <span class="unit-badge" *ngIf="ingredient.produit?.unite">{{ ingredient.produit.unite }}</span>
           <button pButton type="button" icon="pi pi-trash" severity="danger" [text]="true" size="small" (click)="enleverIngredient(idx)"></button>
@@ -146,38 +141,46 @@
         <button pButton type="button" icon="pi pi-search" label="Quelles recettes avec ce stock ?" severity="secondary" size="small" style="width: 100%;" (click)="proposerRecettes()"></button>
       </div>
 
-      <!-- Recettes proposées avec ce stock (sélection multiple) -->
+      <!-- Recettes proposées avec ce stock (identique à la première carte) -->
       <div *ngIf="recettesMatch && recettesMatch.length > 0" class="proposed-stock-block" style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
         <div class="flex-between" style="margin-bottom: 0.6rem;">
           <h3 class="section-title" style="font-size: 0.95rem; color: var(--primary-dark); margin-bottom: 0;">
             <i class="pi pi-sparkles"></i> Recettes proposées ({{ recettesMatch.length }})
           </h3>
-          <button pButton type="button" icon="pi pi-times" [text]="true" size="small" (click)="recettesMatch = null; selectedRecipes = []; optionsRecettesMatch = []" pTooltip="Fermer"></button>
+          <button pButton type="button" icon="pi pi-times" [text]="true" size="small" (click)="recettesMatch = null" pTooltip="Fermer"></button>
         </div>
-        <p-multiSelect [options]="optionsRecettesMatch"
-                       [(ngModel)]="selectedRecipes"
-                       [filter]="true"
-                       [autofocusFilter]="false"
-                       [maxSelectedLabels]="1"
-                       defaultLabel="Choisir parmi les recettes..."
-                       selectedItemsLabel="{0} recettes sélectionnées"
-                       [style]="{width: '100%'}">
-        </p-multiSelect>
+        <div class="matching-recipes-list flex-column gap-xs" style="max-height: 180px;">
+          <div *ngFor="let r of recettesMatch" class="tag-recipe-row flex-between">
+            <div class="tag-recipe-title-area flex-center gap-xs">
+              <span class="font-bold recipe-name-text" [pTooltip]="r.tooltipIngredients">{{ r.titre }}</span>
+              <button *ngIf="r.instructions" pButton type="button" icon="pi pi-align-left" [text]="true" size="small" pTooltip="Instructions" (click)="viewInstructions(r)" class="mini-icon-btn"></button>
+            </div>
+            <button pButton type="button" 
+                    [icon]="isRecipeInMenu(r) ? 'pi pi-check' : 'pi pi-plus'" 
+                    [label]="isRecipeInMenu(r) ? 'Au menu' : 'Ajouter'" 
+                    class="btn-recipe-toggle"
+                    [class.in-menu]="isRecipeInMenu(r)"
+                    [class.not-in-menu]="!isRecipeInMenu(r)"
+                    size="small"
+                    (click)="toggleRecipeInMenu(r)">
+            </button>
+          </div>
+        </div>
       </div>
       <div *ngIf="recettesMatch && recettesMatch.length === 0" style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted); text-align: center;">
         Aucune recette trouvée avec ce stock.
       </div>
     </div>
 
-    <!-- 6. Autres produits -->
+    <!-- 4. Autres produits -->
     <div class="app-card section-card">
       <div class="section-header flex-between">
-        <h2 class="section-title"><i class="pi pi-shopping-bag section-icon"></i> Autres besoins</h2>
+        <h2 class="section-title"><i class="pi pi-shopping-bag section-icon"></i> Autres besoins <span class="card-subtitle-hint">(ajouté aux courses)</span></h2>
         <span class="count-badge">{{ ingredientsAutres.length }}</span>
       </div>
       <div class="items-list flex-column gap-sm">
         <div *ngFor="let ingredient of ingredientsAutres; index as idx" class="item-row">
-          <p-dropdown [filter]="true" [autofocusFilter]="false" [options]="produits" [(ngModel)]="ingredient.produit" placeholder="Produit" [style]="{flex: '1'}"></p-dropdown>
+          <p-dropdown [filter]="true" [autofocusFilter]="false" appendTo="body" [options]="produits" [(ngModel)]="ingredient.produit" placeholder="Produit" [style]="{flex: '1'}"></p-dropdown>
           <input type="number" pInputText [(ngModel)]="ingredient.quantite" placeholder="Qtt" style="width: 60px;">
           <span class="unit-badge" *ngIf="ingredient.produit?.unite">{{ ingredient.produit.unite }}</span>
           <button pButton type="button" icon="pi pi-trash" severity="danger" [text]="true" size="small" (click)="enleverIngredientAutres(idx)"></button>
@@ -191,11 +194,26 @@
   </div>
 
   <!-- Footer Actions -->
-  <div class="menu-footer-bar app-card flex-between">
-    <div class="footer-summary">
-      <span class="font-bold">Total :</span> {{ getNbRecettes() }} recette(s) sélectionnée(s)
+  <div class="menu-footer-bar app-card">
+    <div class="footer-main-row flex-between" style="width: 100%; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+      <div class="footer-summary">
+        <span class="font-bold">Total :</span> {{ getNbRecettes() }} recette(s) sélectionnée(s)
+      </div>
+      <p-button icon="pi pi-check" label="Valider le menu" class="p-button-lg" (click)="calculerCourses()"></p-button>
     </div>
-    <p-button icon="pi pi-shopping-cart" label="Calculer les courses" class="p-button-lg" (click)="calculerCourses()"></p-button>
+
+    <!-- Récapitulatif des recettes sélectionnées au menu -->
+    <div *ngIf="getAllMenuRecipes().length > 0" class="footer-recap-section">
+      <div class="flex-between" style="margin-bottom: 0.35rem;">
+        <span class="font-bold text-xs text-muted">Recettes choisies :</span>
+        <button pButton type="button" icon="pi pi-trash" label="Tout vider" [text]="true" severity="danger" size="small" (click)="viderMenu()" style="padding: 0; font-size: 0.75rem;"></button>
+      </div>
+      <div class="footer-recap-chips flex-wrap gap-xs">
+        <span *ngFor="let r of getAllMenuRecipes()" class="tag-badge tag-badge-removable" (click)="toggleRecipeInMenu(r)" pTooltip="Cliquer pour retirer">
+          {{ r.titre }} <i class="pi pi-times remove-tag-icon"></i>
+        </span>
+      </div>
+    </div>
   </div>
 
   <!-- View Instructions Dialog -->

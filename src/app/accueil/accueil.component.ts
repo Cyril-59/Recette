@@ -1,7 +1,8 @@
 import { Component, OnInit, HostListener, AfterViewInit } from '@angular/core';
 import { SelectItem } from 'primeng/api';
 import { Recette } from '../model/recette';
-import { MenuService } from '../services/menu.service';
+import { Ingredient } from '../model/ingredient';
+import { MenuService, MenuSelectionHistoryItem } from '../services/menu.service';
 
 @Component({
   selector: 'app-accueil',
@@ -14,6 +15,8 @@ export class AccueilComponent implements OnInit, AfterViewInit {
   recettes: Recette[];
   produits: SelectItem[];
   recettesCourses: Recette[] = [];
+  ingredientsStock: Ingredient[] = [];
+  ingredientsAutres: Ingredient[] = [];
   text: string = 'Vide';
   index: number = 0;
   innerWidth: number;
@@ -21,22 +24,56 @@ export class AccueilComponent implements OnInit, AfterViewInit {
   showMenuPreview = false;
   selectedRecipeDetail: Recette = null;
 
-  menuHistory: { id: number; createdAt: string; recettes: Recette[] }[] = [];
+  menuHistory: MenuSelectionHistoryItem[] = [];
   activeHistoryIndex = 0;
 
   constructor(private menuService: MenuService) { }
 
   ngOnInit(): void {
+    try {
+      const savedText = localStorage.getItem('recette_courses_text');
+      if (savedText) {
+        this.text = savedText;
+      }
+      const savedStock = localStorage.getItem('recette_courses_stock');
+      if (savedStock) {
+        this.ingredientsStock = JSON.parse(savedStock);
+      }
+      const savedAutres = localStorage.getItem('recette_courses_autres');
+      if (savedAutres) {
+        this.ingredientsAutres = JSON.parse(savedAutres);
+      }
+    } catch (e) {}
+
     this.loadMenuHistory();
   }
 
   loadMenuHistory(): void {
     this.menuService.getHistory().subscribe((history) => {
       this.menuHistory = history || [];
-      if (this.menuHistory.length > 0 && this.menuHistory[0].recettes) {
-        this.recettesCourses = this.menuHistory[0].recettes;
-      } else {
-        this.recettesCourses = [];
+      if (this.menuHistory.length > 0) {
+        const latest = this.menuHistory[0];
+        if (latest.recettes) {
+          this.recettesCourses = latest.recettes;
+        }
+        if (latest.coursesText) {
+          this.text = latest.coursesText;
+          try {
+            localStorage.setItem('recette_courses_text', this.text);
+          } catch (e) {}
+        }
+        if (latest.stockJson) {
+          try {
+            this.ingredientsStock = JSON.parse(latest.stockJson);
+            localStorage.setItem('recette_courses_stock', latest.stockJson);
+          } catch (e) {}
+        }
+        if (latest.autresJson) {
+          try {
+            this.ingredientsAutres = JSON.parse(latest.autresJson);
+            localStorage.setItem('recette_courses_autres', latest.autresJson);
+          } catch (e) {}
+        }
       }
     });
   }
@@ -81,8 +118,14 @@ export class AccueilComponent implements OnInit, AfterViewInit {
     this.recettes = recettes;
   }
 
-  setText(text) {
-    this.text = text;
+  setCourses(event: any) {
+    if (typeof event === 'string') {
+      this.text = event;
+    } else if (event) {
+      this.text = event.text;
+      this.ingredientsStock = event.stock || [];
+      this.ingredientsAutres = event.autres || [];
+    }
     this.index = 1;
   }
 }

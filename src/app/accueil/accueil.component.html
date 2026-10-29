@@ -1,4 +1,4 @@
-<p-toast></p-toast>
+<p-toast [breakpoints]="{'640px': {width: 'calc(100vw - 1.5rem)', right: '0.75rem', left: '0.75rem'}}"></p-toast>
 <div id="spinner" *ngIf="!(produitReady && recetteReady)">
     <div id="inner">
         <p-progressSpinner></p-progressSpinner>
@@ -57,10 +57,10 @@
     </div>
 
     <div [style.display]="index === 0 ? 'block' : 'none'">
-      <app-stocks [innerWidth]="innerWidth" [produits]="produits" [recettes]="recettes" [recettesCourses]="recettesCourses" (onCourses)="setText($event)"></app-stocks>
+      <app-stocks [innerWidth]="innerWidth" [produits]="produits" [recettes]="recettes" [recettesCourses]="recettesCourses" (onCourses)="setCourses($event)"></app-stocks>
     </div>
     <div [style.display]="index === 1 ? 'block' : 'none'">
-      <app-courses [text]="text" [recettes]="recettesCourses"></app-courses>
+      <app-courses [text]="text" [recettes]="recettesCourses" [stockIngredients]="ingredientsStock" [autresIngredients]="ingredientsAutres"></app-courses>
     </div>
     <div [style.display]="index === 2 ? 'block' : 'none'">
       <app-recettes [innerWidth]="innerWidth" [produits]="produits" (onRecettes)="setRecettes($event)"></app-recettes>
@@ -131,7 +131,7 @@
           <div class="recipe-item-left">
             <h4 class="recipe-item-title">{{ r.titre }}</h4>
             <div class="tags-container" *ngIf="r.tags && r.tags.length > 0" style="margin-bottom: 0.25rem;">
-              <span *ngFor="let t of r.tags" class="tag-badge" [ngClass]="{'tag-vege': t === 'Végétarien', 'tag-express': t.startsWith('Express')}">{{ t }}</span>
+              <span *ngFor="let t of r.tags" class="tag-badge" [ngClass]="{'tag-favori': t === 'Favori', 'tag-vege': t === 'Végé' || t === 'Végétarien', 'tag-express': t.startsWith('Express')}">{{ t }}</span>
             </div>
             <span class="recipe-item-ingredients-count" *ngIf="r.ingredients && r.ingredients.length > 0">
               {{ r.ingredients.length }} ingrédient(s)
@@ -171,7 +171,7 @@
 
       <!-- Tags -->
       <div *ngIf="selectedRecipeDetail.tags && selectedRecipeDetail.tags.length > 0" class="tags-container" style="margin-top: -0.25rem;">
-        <span *ngFor="let t of selectedRecipeDetail.tags" class="tag-badge" [ngClass]="{'tag-vege': t === 'Végétarien', 'tag-express': t.startsWith('Express')}">{{ t }}</span>
+        <span *ngFor="let t of selectedRecipeDetail.tags" class="tag-badge" [ngClass]="{'tag-favori': t === 'Favori', 'tag-vege': t === 'Végé' || t === 'Végétarien', 'tag-express': t.startsWith('Express')}">{{ t }}</span>
       </div>
 
       <!-- Ingrédients de la recette -->

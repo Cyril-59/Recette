@@ -24,8 +24,8 @@ export class RecettesComponent implements OnInit {
   instructionsDialog = false;
   recipeForInstructions: Recette = null;
 
-  predefinedTags: string[] = ['Végétarien', 'Express', 'Batch cooking'];
-  availableFilterTags: string[] = ['Végétarien', 'Express', 'Batch cooking'];
+  predefinedTags: string[] = ['Favori', 'Végé', 'Express', 'Batch cooking'];
+  availableFilterTags: string[] = ['Favori', 'Végé', 'Express', 'Batch cooking'];
   selectedTagFilter: string = null;
   customTagInput: string = '';
   selectedLinkedRecipe: Recette = null;

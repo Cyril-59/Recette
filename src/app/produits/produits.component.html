@@ -11,7 +11,14 @@
   <div class="app-card filters-card">
     <div class="search-input-wrapper">
       <i class="pi pi-search search-icon"></i>
-      <input pInputText type="text" (input)="dt.filterGlobal($event.target.value, 'contains')" placeholder="Rechercher un produit..." class="search-input">
+      <input #searchInputP pInputText type="text" (input)="dt.filterGlobal($event.target.value, 'contains')" placeholder="Rechercher un produit..." class="search-input">
+      <button *ngIf="searchInputP.value && searchInputP.value.length > 0"
+              type="button"
+              class="clear-search-btn"
+              (click)="searchInputP.value = ''; dt.filterGlobal('', 'contains')"
+              pTooltip="Effacer la recherche">
+        <i class="pi pi-times"></i>
+      </button>
     </div>
 
     <!-- Ligne 1 : Les 4 Filtres Saisons -->
