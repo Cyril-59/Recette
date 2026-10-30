@@ -127,15 +127,27 @@
           {{ activeHistoryIndex === 0 ? 'Recettes prévues pour cette semaine :' : 'Recettes cuisinées la semaine précédente :' }}
         </p>
         
-        <div *ngFor="let r of getActiveRecipes()" class="planned-recipe-item flex-between" (click)="selectRecipeDetail(r)">
-          <div class="recipe-item-left">
-            <h4 class="recipe-item-title">{{ r.titre }}</h4>
-            <div class="tags-container" *ngIf="r.tags && r.tags.length > 0" style="margin-bottom: 0.25rem;">
-              <span *ngFor="let t of r.tags" class="tag-badge" [ngClass]="{'tag-favori': t === 'Favori', 'tag-vege': t === 'Végé' || t === 'Végétarien', 'tag-express': t.startsWith('Express')}">{{ t }}</span>
+        <div *ngFor="let r of getActiveRecipes()" 
+             class="planned-recipe-item flex-between" 
+             [class.is-done]="isRecipeDone(r)"
+             (click)="selectRecipeDetail(r)">
+          <div class="recipe-item-left flex-center gap-sm">
+            <button type="button" 
+                    class="recipe-done-btn" 
+                    [class.checked]="isRecipeDone(r)"
+                    (click)="$event.stopPropagation(); toggleRecipeDone(r)"
+                    [pTooltip]="isRecipeDone(r) ? 'Marquer comme non réalisée' : 'Marquer comme réalisée'">
+              <i *ngIf="isRecipeDone(r)" class="pi pi-check done-check-icon"></i>
+            </button>
+            <div class="recipe-item-info">
+              <h4 class="recipe-item-title" [class.title-done]="isRecipeDone(r)">{{ r.titre }}</h4>
+              <div class="tags-container" *ngIf="r.tags && r.tags.length > 0" style="margin-bottom: 0.25rem;">
+                <span *ngFor="let t of r.tags" class="tag-badge" [ngClass]="{'tag-favori': t === 'Favori', 'tag-vege': t === 'Végé' || t === 'Végétarien', 'tag-express': t.startsWith('Express')}">{{ t }}</span>
+              </div>
+              <span class="recipe-item-ingredients-count" *ngIf="r.ingredients && r.ingredients.length > 0">
+                {{ r.ingredients.length }} ingrédient(s)
+              </span>
             </div>
-            <span class="recipe-item-ingredients-count" *ngIf="r.ingredients && r.ingredients.length > 0">
-              {{ r.ingredients.length }} ingrédient(s)
-            </span>
           </div>
           <div class="recipe-item-right flex-center gap-sm">
             <span *ngIf="r.instructions" class="has-instructions-pill">

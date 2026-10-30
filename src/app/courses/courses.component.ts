@@ -31,6 +31,21 @@ export class CoursesComponent implements OnInit {
     }
   }
 
+  getLinkedPartnersInMenu(recipe: Recette): Recette[] {
+    if (!recipe || !recipe.linkedRecettes || !this.recettes) return [];
+    const linkedIds = new Set(recipe.linkedRecettes.map(lr => lr.id));
+    return this.recettes.filter(r => r.id !== recipe.id && linkedIds.has(r.id));
+  }
+
+  hasLinkedPartner(recipe: Recette): boolean {
+    return this.getLinkedPartnersInMenu(recipe).length > 0;
+  }
+
+  getPartnerTitles(recipe: Recette): string {
+    const partners = this.getLinkedPartnersInMenu(recipe);
+    return partners.map(p => p.titre).join(', ');
+  }
+
   getPlainText(): string {
     if (!this.text) return '';
     return this.text
@@ -58,7 +73,7 @@ export class CoursesComponent implements OnInit {
     }
 
     if (this.stockIngredients && this.stockIngredients.length > 0) {
-      message += '📦 *En stock (déduit des courses) :*\n';
+      message += '📦 *À finir (déduit des courses) :*\n';
       for (const ing of this.stockIngredients) {
         message += `• ${ing.quantite} ${ing.produit?.unite || ''} ${ing.produit?.label}\n`;
       }

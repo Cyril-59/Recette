@@ -192,8 +192,10 @@
   flex: 1;
   min-width: 0;
   overflow: hidden;
-  display: flex;
-  align-items: center;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  text-align: left !important;
   gap: 0.35rem;
 }
 
@@ -457,6 +459,77 @@
 .footer-recap-chips {
   max-height: 90px;
   overflow-y: auto;
+}
+
+/* Stock Balance Box */
+.stock-balance-box {
+  background-color: white;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 0.75rem;
+  margin-top: 0.85rem;
+}
+
+.stock-balance-header {
+  margin-bottom: 0.35rem;
+}
+
+.stock-balance-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.stock-balance-row {
+  padding: 0.35rem 0.6rem;
+  border-radius: var(--radius-sm);
+  transition: all 0.15s ease;
+}
+
+.stock-balance-row.balance-complete {
+  background-color: var(--primary-light);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.stock-balance-row.balance-remaining {
+  background-color: #fefce8;
+  border: 1px solid #fef08a;
+}
+
+.balance-icon-check,
+.balance-icon-info {
+  font-size: 0.9rem;
+  margin-right: 0.35rem;
+}
+
+.balance-icon-check {
+  color: var(--primary-dark);
+}
+
+.balance-icon-info {
+  color: #ca8a04;
+}
+
+.badge-all-done {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+}
+
+.badge-remaining {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #854d0e;
+}
+
+.recipe-stock-usage-sub {
+  font-size: 0.72rem;
+  color: var(--primary-dark);
+  display: block;
+  margin-top: 0.1rem;
 }
 
 /* Recipe Toggle Button (Ajouter / Au menu) */

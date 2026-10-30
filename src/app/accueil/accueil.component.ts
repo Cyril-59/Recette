@@ -26,6 +26,7 @@ export class AccueilComponent implements OnInit, AfterViewInit {
 
   menuHistory: MenuSelectionHistoryItem[] = [];
   activeHistoryIndex = 0;
+  doneRecipeIds: Set<number> = new Set<number>();
 
   constructor(private menuService: MenuService) { }
 
@@ -43,9 +44,41 @@ export class AccueilComponent implements OnInit, AfterViewInit {
       if (savedAutres) {
         this.ingredientsAutres = JSON.parse(savedAutres);
       }
+      const savedDone = localStorage.getItem('recette_done_recipe_ids');
+      if (savedDone) {
+        this.doneRecipeIds = new Set<number>(JSON.parse(savedDone));
+      }
     } catch (e) {}
 
     this.loadMenuHistory();
+  }
+
+  isRecipeDone(recipe: Recette): boolean {
+    if (!recipe || !recipe.id || !this.menuHistory || this.menuHistory.length === 0) return false;
+    const current = this.menuHistory[this.activeHistoryIndex];
+    return current && current.doneRecipeIds ? current.doneRecipeIds.includes(recipe.id) : false;
+  }
+
+  toggleRecipeDone(recipe: Recette): void {
+    if (!recipe || !recipe.id || !this.menuHistory || this.menuHistory.length === 0) return;
+    const current = this.menuHistory[this.activeHistoryIndex];
+    if (!current || !current.id) return;
+
+    if (!current.doneRecipeIds) {
+      current.doneRecipeIds = [];
+    }
+    const idx = current.doneRecipeIds.indexOf(recipe.id);
+    if (idx >= 0) {
+      current.doneRecipeIds.splice(idx, 1);
+    } else {
+      current.doneRecipeIds.push(recipe.id);
+    }
+
+    this.menuService.toggleRecipeDone(current.id, recipe.id).subscribe((updated) => {
+      if (updated && updated.doneRecipeIds) {
+        current.doneRecipeIds = Array.from(updated.doneRecipeIds);
+      }
+    });
   }
 
   loadMenuHistory(): void {

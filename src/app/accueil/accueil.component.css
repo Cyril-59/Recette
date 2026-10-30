@@ -271,6 +271,49 @@
   transform: translateX(3px);
 }
 
+.planned-recipe-item.is-done {
+  background-color: var(--primary-light) !important;
+  border-color: rgba(16, 185, 129, 0.4) !important;
+}
+
+.recipe-done-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-full);
+  border: 2px solid var(--border-color);
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+  padding: 0;
+  outline: none;
+}
+
+.recipe-done-btn:hover {
+  border-color: var(--primary);
+  background-color: var(--primary-light);
+}
+
+.recipe-done-btn.checked {
+  background-color: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: white !important;
+}
+
+.done-check-icon {
+  font-size: 0.75rem;
+  font-weight: 900;
+  color: white;
+}
+
+.title-done {
+  color: var(--primary-dark) !important;
+  font-weight: 700 !important;
+}
+
 .recipe-item-title {
   font-size: 1rem;
   font-weight: 600;

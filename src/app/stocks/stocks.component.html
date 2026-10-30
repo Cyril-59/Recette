@@ -59,7 +59,7 @@
         <!-- Liste des recettes correspondantes aux filtres combinés -->
         <div class="matching-recipes-list flex-column gap-xs">
           <div *ngFor="let r of getMatchingRecipes()" class="tag-recipe-row flex-between">
-            <div class="tag-recipe-title-area flex-center gap-xs">
+            <div class="tag-recipe-title-area gap-xs">
               <span class="font-bold recipe-name-text" [pTooltip]="r.tooltipIngredients">{{ r.titre }}</span>
               <button *ngIf="r.instructions" pButton type="button" icon="pi pi-align-left" [text]="true" size="small" pTooltip="Instructions" (click)="viewInstructions(r)" class="mini-icon-btn"></button>
             </div>
@@ -121,7 +121,7 @@
     <!-- 3. Ce que j'ai en stock (avec les recettes proposées affichées directement sous la carte) -->
     <div class="app-card section-card">
       <div class="section-header flex-between">
-        <h2 class="section-title"><i class="pi pi-box section-icon"></i> En stock</h2>
+        <h2 class="section-title"><i class="pi pi-box section-icon"></i> À finir</h2>
         <span class="card-subtitle-hint">déduit des courses</span>
       </div>
       <div class="items-list flex-column gap-sm">
@@ -129,18 +129,43 @@
           <p-dropdown [filter]="true" [autofocusFilter]="false" appendTo="body" [options]="produits" [(ngModel)]="ingredient.produit" placeholder="Produit" [style]="{flex: '1'}"></p-dropdown>
           <input type="number" pInputText [(ngModel)]="ingredient.quantite" placeholder="Qtt" style="width: 60px;">
           <span class="unit-badge" *ngIf="ingredient.produit?.unite">{{ ingredient.produit.unite }}</span>
-          <button pButton type="button" icon="pi pi-trash" severity="danger" [text]="true" size="small" (click)="enleverIngredient(idx)"></button>
         </div>
       </div>
       <div class="section-actions flex-between">
         <p-button icon="pi pi-plus" label="Ajouter" size="small" [outlined]="true" (click)="ajouterIngredient()"></p-button>
         <button pButton type="button" icon="pi pi-undo" [text]="true" size="small" (click)="initStock()" pTooltip="Réinitialiser"></button>
       </div>
-      <div style="margin-top: 1rem;">
-        <button pButton type="button" icon="pi pi-search" label="Quelles recettes avec ce stock ?" severity="secondary" size="small" style="width: 100%;" (click)="proposerRecettes()"></button>
+
+      <!-- Bilan des produits à finir calculé en direct selon les recettes au menu -->
+      <div *ngIf="hasSelectedRecipesAndStock()" class="stock-balance-box flex-column gap-xs">
+        <div class="stock-balance-header flex-between">
+          <span class="stock-balance-title">
+            <i class="pi pi-chart-pie"></i> Bilan des produits à finir :
+          </span>
+        </div>
+        <div class="stock-balance-grid flex-column gap-xs">
+          <div *ngFor="let item of getStockBalance()" class="stock-balance-row flex-between" [class.balance-complete]="item.remaining <= 0" [class.balance-remaining]="item.remaining > 0">
+            <div class="flex-center gap-xs">
+              <i [class]="item.remaining <= 0 ? 'pi pi-check-circle balance-icon-check' : 'pi pi-info-circle balance-icon-info'"></i>
+              <span class="font-bold text-sm">{{ item.produit.label }}</span>
+            </div>
+            <div class="stock-balance-details flex-center gap-xs">
+              <span *ngIf="item.remaining > 0" class="badge-remaining">
+                Reste : <strong>{{ item.remaining }}</strong> {{ item.produit.unite }}
+              </span>
+              <span *ngIf="item.remaining <= 0" class="badge-all-done">
+                <i class="pi pi-check"></i> Tout utilisé !
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <!-- Recettes proposées avec ce stock (identique à la première carte) -->
+      <div style="margin-top: 1rem;">
+        <button pButton type="button" icon="pi pi-search" label="Quelles recettes avec ces produits ?" severity="secondary" size="small" style="width: 100%;" (click)="proposerRecettes()"></button>
+      </div>
+
+      <!-- Recettes proposées avec ces produits -->
       <div *ngIf="recettesMatch && recettesMatch.length > 0" class="proposed-stock-block" style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
         <div class="flex-between" style="margin-bottom: 0.6rem;">
           <h3 class="section-title" style="font-size: 0.95rem; color: var(--primary-dark); margin-bottom: 0;">
@@ -150,8 +175,13 @@
         </div>
         <div class="matching-recipes-list flex-column gap-xs" style="max-height: 180px;">
           <div *ngFor="let r of recettesMatch" class="tag-recipe-row flex-between">
-            <div class="tag-recipe-title-area flex-center gap-xs">
-              <span class="font-bold recipe-name-text" [pTooltip]="r.tooltipIngredients">{{ r.titre }}</span>
+            <div class="tag-recipe-title-area gap-xs">
+              <div class="flex-column" style="min-width: 0;">
+                <span class="font-bold recipe-name-text" [pTooltip]="r.tooltipIngredients">{{ r.titre }}</span>
+                <span *ngIf="getRecipeStockUsage(r)" class="recipe-stock-usage-sub">
+                  <i class="pi pi-box" style="font-size: 0.65rem;"></i> Utilise : {{ getRecipeStockUsage(r) }}
+                </span>
+              </div>
               <button *ngIf="r.instructions" pButton type="button" icon="pi pi-align-left" [text]="true" size="small" pTooltip="Instructions" (click)="viewInstructions(r)" class="mini-icon-btn"></button>
             </div>
             <button pButton type="button" 
@@ -160,14 +190,14 @@
                     class="btn-recipe-toggle"
                     [class.in-menu]="isRecipeInMenu(r)"
                     [class.not-in-menu]="!isRecipeInMenu(r)"
-                    size="small"
+                    size="small" 
                     (click)="toggleRecipeInMenu(r)">
             </button>
           </div>
         </div>
       </div>
       <div *ngIf="recettesMatch && recettesMatch.length === 0" style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted); text-align: center;">
-        Aucune recette trouvée avec ce stock.
+        Aucune recette trouvée avec ces produits.
       </div>
     </div>
 
@@ -182,7 +212,6 @@
           <p-dropdown [filter]="true" [autofocusFilter]="false" appendTo="body" [options]="produits" [(ngModel)]="ingredient.produit" placeholder="Produit" [style]="{flex: '1'}"></p-dropdown>
           <input type="number" pInputText [(ngModel)]="ingredient.quantite" placeholder="Qtt" style="width: 60px;">
           <span class="unit-badge" *ngIf="ingredient.produit?.unite">{{ ingredient.produit.unite }}</span>
-          <button pButton type="button" icon="pi pi-trash" severity="danger" [text]="true" size="small" (click)="enleverIngredientAutres(idx)"></button>
         </div>
       </div>
       <div class="section-actions flex-between">
@@ -219,7 +248,7 @@
       </div>
       <div class="footer-recipes-desktop-list">
         <div *ngFor="let r of getAllMenuRecipes()" class="tag-recipe-row flex-between footer-recipe-desktop-item">
-          <div class="tag-recipe-title-area flex-center gap-xs">
+          <div class="tag-recipe-title-area gap-xs">
             <span class="recipe-name-text font-bold text-sm" [pTooltip]="r.titre">{{ r.titre }}</span>
             <button *ngIf="r.instructions" pButton type="button" icon="pi pi-align-left" [text]="true" size="small" (click)="viewInstructions(r)" class="mini-icon-btn" pTooltip="Instructions"></button>
           </div>

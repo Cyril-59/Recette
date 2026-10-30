@@ -1,6 +1,7 @@
 import { Component, OnInit, Input, OnChanges, SimpleChanges, EventEmitter, Output } from '@angular/core';
 import { Recette } from '../model/recette';
 import { Ingredient } from '../model/ingredient';
+import { Produit } from '../model/produit';
 import { SelectItem, MessageService } from 'primeng/api';
 import { MenuService } from '../services/menu.service';
 
@@ -259,10 +260,8 @@ export class StocksComponent implements OnInit, OnChanges {
         const idxStock = this.selectedRecipes.findIndex(r => r.id === recipe.id);
         if (idxStock > -1) this.selectedRecipes.splice(idxStock, 1);
       }
-      this.messageService.add({severity:'info', summary:'Retirée du menu', detail: recipe.titre});
     } else {
       this.selectedMenuRecipes.push(recipe);
-      this.messageService.add({severity:'success', summary:'Ajoutée au menu', detail: recipe.titre});
     }
   }
 
@@ -318,6 +317,109 @@ export class StocksComponent implements OnInit, OnChanges {
     } else {
       this.optionsRecettesMatch = [];
     }
+  }
+
+  hasSelectedRecipesAndStock(): boolean {
+    const hasStock = this.ingredients && this.ingredients.some(i => !!i.produit && !!i.quantite);
+    const hasRecipes = this.getAllMenuRecipes().length > 0;
+    return !!(hasStock && hasRecipes);
+  }
+
+  getStockBalance(): { produit: Produit; initial: number; used: number; remaining: number }[] {
+    const validStock = this.ingredients
+      ? this.ingredients.filter(i => !!i.produit && !!i.produit.label && !!i.quantite)
+      : [];
+    if (validStock.length === 0) return [];
+
+    const selectedRecettes = this.getAllMenuRecipes();
+    const usedMap = new Map<string, number>();
+    for (const r of selectedRecettes) {
+      if (r.ingredients) {
+        for (const ing of r.ingredients) {
+          if (ing.produit && ing.produit.label && ing.quantite) {
+            const key = ing.produit.label.toLowerCase();
+            usedMap.set(key, (usedMap.get(key) || 0) + +ing.quantite);
+          }
+        }
+      }
+    }
+
+    return validStock.map(stockItem => {
+      const key = stockItem.produit.label.toLowerCase();
+      const initial = +stockItem.quantite || 0;
+      const used = usedMap.get(key) || 0;
+      const remaining = initial - used;
+      return {
+        produit: stockItem.produit,
+        initial,
+        used,
+        remaining
+      };
+    });
+  }
+
+  pluralizeProduct(label: string, quantity: number): string {
+    if (!label || quantity <= 1) return label;
+    const trimmed = label.trim();
+    const lower = trimmed.toLowerCase();
+
+    // Terminaisons invariables ou déjà au pluriel en français (s, x, z)
+    if (lower.endsWith('s') || lower.endsWith('x') || lower.endsWith('z')) {
+      return trimmed;
+    }
+
+    // Mots composés avec "de" ou "d'" (ex: "pomme de terre" -> "pommes de terre", "gousse d'ail" -> "gousses d'ail")
+    const deIndex = lower.indexOf(' de ');
+    const dAposIndex = lower.indexOf(" d'");
+    if (deIndex > 0) {
+      const firstWord = trimmed.substring(0, deIndex);
+      const rest = trimmed.substring(deIndex);
+      return this.pluralizeSingleWord(firstWord) + rest;
+    }
+    if (dAposIndex > 0) {
+      const firstWord = trimmed.substring(0, dAposIndex);
+      const rest = trimmed.substring(dAposIndex);
+      return this.pluralizeSingleWord(firstWord) + rest;
+    }
+
+    return this.pluralizeSingleWord(trimmed);
+  }
+
+  private pluralizeSingleWord(word: string): string {
+    const lower = word.toLowerCase();
+    if (lower.endsWith('s') || lower.endsWith('x') || lower.endsWith('z')) {
+      return word;
+    }
+    if (lower.endsWith('au') || lower.endsWith('eu')) {
+      return word + 'x';
+    }
+    if (lower.endsWith('al') && !['bal', 'carnaval', 'festival', 'chacal'].includes(lower)) {
+      return word.substring(0, word.length - 2) + 'aux';
+    }
+    return word + 's';
+  }
+
+  getRecipeStockUsage(recipe: Recette): string {
+    if (!recipe || !recipe.ingredients || !this.ingredients) return '';
+    const validStockLabels = new Set(
+      this.ingredients
+        .filter(i => !!i.produit && !!i.produit.label)
+        .map(i => i.produit.label.toLowerCase())
+    );
+    const parts: string[] = [];
+    for (const ing of recipe.ingredients) {
+      if (ing.produit && validStockLabels.has(ing.produit.label.toLowerCase())) {
+        const qty = +ing.quantite || 0;
+        const pluralLabel = this.pluralizeProduct(ing.produit.label, qty);
+        if (ing.produit.unite && ing.produit.unite !== 'pièce(s)') {
+          const unit = ing.produit.unite === 'grammes' ? 'g' : ing.produit.unite;
+          parts.push(`${qty} ${unit} ${pluralLabel}`.trim());
+        } else {
+          parts.push(`${qty} ${pluralLabel}`.trim());
+        }
+      }
+    }
+    return parts.join(', ');
   }
 
   ajouterIngredient() {
@@ -437,7 +539,7 @@ export class StocksComponent implements OnInit, OnChanges {
                 }
                 copy += ' ';
               }
-              copy += ing.produit.label;
+              copy += this.pluralizeProduct(ing.produit.label, +ing.quantite || 0);
               first = false;
             }
           }

@@ -62,6 +62,25 @@
   border-radius: var(--radius-full);
 }
 
+.recipe-chip.has-linked-partner {
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+.chip-link-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background-color: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+  border-radius: var(--radius-full);
+  padding: 0.1rem 0.45rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  margin-left: 0.35rem;
+  cursor: pointer;
+}
+
 .chip-icon {
   font-size: 0.75rem;
 }

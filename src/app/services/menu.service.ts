@@ -10,6 +10,7 @@ export interface MenuSelectionHistoryItem {
   coursesText?: string;
   stockJson?: string;
   autresJson?: string;
+  doneRecipeIds?: number[];
   recettes: Recette[];
 }
 
@@ -33,6 +34,10 @@ export class MenuService {
 
   saveSelection(recetteIds: number[], coursesText?: string, stockJson?: string, autresJson?: string): Observable<Recette[]> {
     return this.http.post<Recette[]>(this.apiUrl, { recetteIds, coursesText, stockJson, autresJson });
+  }
+
+  toggleRecipeDone(menuId: number, recetteId: number): Observable<MenuSelectionHistoryItem> {
+    return this.http.patch<MenuSelectionHistoryItem>(`${this.apiUrl}/${menuId}/done/${recetteId}`, {});
   }
 
   clearSelection(): Observable<void> {
