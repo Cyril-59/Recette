@@ -100,6 +100,9 @@ export class ProduitsComponent implements OnInit {
     produit.ete = this.ete;
     produit.unite = this.unite;
     produit.type = this.type;
+    if (produit.label) {
+      produit.label = produit.label.trim().toLowerCase();
+    }
     if (!produit.id) {
       this.produitService.createProduit(produit).subscribe(() => {
         this.edit = false;

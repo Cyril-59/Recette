@@ -24,8 +24,8 @@ export class RecettesComponent implements OnInit {
   instructionsDialog = false;
   recipeForInstructions: Recette = null;
 
-  predefinedTags: string[] = ['Favori', 'Végé', 'Express', 'Batch cooking'];
-  availableFilterTags: string[] = ['Favori', 'Végé', 'Express', 'Batch cooking'];
+  predefinedTags: string[] = ['Favori', 'Végé', 'Express', 'Batch'];
+  availableFilterTags: string[] = ['Favori', 'Végé', 'Express', 'Batch'];
   selectedTagFilter: string = null;
   customTagInput: string = '';
   selectedLinkedRecipe: Recette = null;
@@ -66,6 +66,17 @@ export class RecettesComponent implements OnInit {
   getRecettes() {
     this.recetteService.getRecettes().subscribe((recettes) => {
       for (const recette of recettes) {
+        if (recette.ingredients && recette.ingredients.length > 0) {
+          const seen = new Set<string>();
+          recette.ingredients = recette.ingredients.filter(ing => {
+            const key = (ing.id ? 'id:' + ing.id : '') + (ing.produit && ing.produit.id ? '_p:' + ing.produit.id : (ing.produit ? '_l:' + ing.produit.label : ''));
+            if (key) {
+              if (seen.has(key)) return false;
+              seen.add(key);
+            }
+            return true;
+          });
+        }
         let stringIngredients = '';
         let tooltipIngredients = '';
         for (const ingredient of recette.ingredients) {
@@ -110,6 +121,12 @@ export class RecettesComponent implements OnInit {
   }
 
   creerRecette() {
+    if (this.recette.titre) {
+      const trimmed = this.recette.titre.trim();
+      if (trimmed.length > 0) {
+        this.recette.titre = trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
+      }
+    }
     this.recette.automne = this.automne;
     this.recette.ete = this.ete;
     this.recette.hiver = this.hiver;
@@ -153,6 +170,17 @@ export class RecettesComponent implements OnInit {
 
   recipeSelected(id: number) {
     this.recette = this.recettes.find((r) => r.id === id);
+    if (this.recette && this.recette.ingredients && this.recette.ingredients.length > 0) {
+      const seen = new Set<string>();
+      this.recette.ingredients = this.recette.ingredients.filter(ing => {
+        const key = (ing.id ? 'id:' + ing.id : '') + (ing.produit && ing.produit.id ? '_p:' + ing.produit.id : (ing.produit ? '_l:' + ing.produit.label : ''));
+        if (key) {
+          if (seen.has(key)) return false;
+          seen.add(key);
+        }
+        return true;
+      });
+    }
     if (!this.recette.tags) {
       this.recette.tags = [];
     }

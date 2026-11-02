@@ -32,8 +32,8 @@ export class StocksComponent implements OnInit, OnChanges {
   selectedFilterTags: Set<string> = new Set<string>();
   recipeSearchQuery: string = '';
 
-  availableTags: string[] = ['Favori', 'Végé', 'Express', 'Batch cooking'];
-  allTags: string[] = ['Favori', 'Végé', 'Express', 'Batch cooking'];
+  availableTags: string[] = ['Favori', 'Végé', 'Express', 'Batch'];
+  allTags: string[] = ['Favori', 'Végé', 'Express', 'Batch'];
   selectedTag: string = null;
   instructionsDialog = false;
   recipeForInstructions: Recette = null;

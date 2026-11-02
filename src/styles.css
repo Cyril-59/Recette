@@ -402,3 +402,43 @@ body {
   color: var(--primary-dark) !important;
   border-color: var(--primary-dark) !important;
 }
+
+/* Shared Tag Badges & Containers */
+.tags-container {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 0.35rem !important;
+  margin-top: 0.25rem;
+}
+
+.tag-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.25rem !important;
+  padding: 0.18rem 0.55rem !important;
+  background-color: #f1f5f9;
+  color: #334155;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid var(--border-color);
+  line-height: 1.2;
+}
+
+.tag-vege {
+  background-color: var(--primary-light) !important;
+  color: var(--primary-dark) !important;
+  border-color: rgba(16, 185, 129, 0.3) !important;
+}
+
+.tag-express {
+  background-color: #fffbeb !important;
+  color: #b45309 !important;
+  border-color: #fde68a !important;
+}
+
+.tag-anti-gaspi {
+  background-color: #fef3c7 !important;
+  color: #92400e !important;
+  border-color: #fde68a !important;
+}
